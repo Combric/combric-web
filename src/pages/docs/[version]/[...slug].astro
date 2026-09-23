@@ -1,0 +1,110 @@
+---
+import { getCollection, render } from "astro:content";
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import {
+  currentDocumentationVersion,
+  documentationVersions,
+  docsRoute,
+} from "../../../data/versions";
+import "../../../styles/docs.css";
+
+export const prerender = true;
+
+function pagePath(id: string) {
+  const snapshotMarker = "/src/content/snapshots/";
+  const snapshotPath = id.includes(snapshotMarker)
+    ? (id.split(snapshotMarker)[1] ?? "")
+    : id;
+  const path = snapshotPath
+    .split("/")
+    .slice(1)
+    .join("/")
+    .replace(/\.mdx?$/, "")
+    .replace(/\/index$/, "");
+  return path === "index" ? "" : path;
+}
+
+export async function getStaticPaths() {
+  const snapshots = await getCollection("snapshots");
+  const snapshotPagePath = (id: string) => {
+    const snapshotMarker = "/src/content/snapshots/";
+    const snapshotPath = id.includes(snapshotMarker)
+      ? (id.split(snapshotMarker)[1] ?? "")
+      : id;
+    const path = snapshotPath
+      .split("/")
+      .slice(1)
+      .join("/")
+      .replace(/\.mdx?$/, "")
+      .replace(/\/index$/, "");
+    return path === "index" ? "" : path;
+  };
+  return documentationVersions.flatMap((version) =>
+    snapshots
+      .filter((entry) => {
+        const normalizedVersionId = version.id.replaceAll(".", "");
+        return (
+          entry.id.startsWith(`${version.id}/`) ||
+          entry.id.startsWith(`${normalizedVersionId}/`)
+        );
+      })
+      .filter((entry) => snapshotPagePath(entry.id) !== "")
+      .map((entry) => ({
+        params: {
+          version: version.id,
+          slug: snapshotPagePath(entry.id) || undefined,
+        },
+        props: { entry, version },
+      })),
+  );
+}
+
+const { entry, version } = Astro.props;
+const { Content } = await render(entry);
+const canonical = docsRoute(version, pagePath(entry.id));
+const frontmatter = {
+  ...entry.data,
+  editUrl:
+    typeof entry.data.editUrl === "string"
+      ? entry.data.editUrl
+      : (false as false),
+};
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="canonical" href={canonical} />
+    <title>{entry.data.title} — Combric {version.label}</title>
+  </head>
+  <body>
+    <StarlightPage frontmatter={frontmatter}>
+      <div
+        class="combric-version-header"
+        role="region"
+        aria-label="Documentation version selector"
+      >
+        <a href={docsRoute(currentDocumentationVersion)}>Combric</a>
+        <label>
+          <span>Documentation version</span>
+          <select
+            aria-label="Documentation version"
+            onchange={`window.location.href=this.value`}
+          >
+            {documentationVersions.map((option) => (
+              <option
+                value={docsRoute(option, pagePath(entry.id))}
+                selected={option.id === version.id}
+              >
+                {option.label} —{" "}
+                {option.status === "current" ? "Current" : "Previous"}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <Content />
+    </StarlightPage>
+  </body>
+</html>

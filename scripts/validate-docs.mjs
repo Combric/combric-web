@@ -1,16 +1,41 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
+import {
+  currentDocumentationVersion,
+  documentationVersions,
+  docsRoute,
+  latestRoute,
+} from "../src/data/versions.ts";
 
 const root = process.cwd();
 const failures = [];
+if (currentDocumentationVersion.id !== "v1.0.0")
+  failures.push("Current documentation version must be v1.0.0");
+if (
+  new Set(documentationVersions.map((version) => version.id)).size !==
+  documentationVersions.length
+)
+  failures.push("Duplicate version IDs");
+if (
+  !documentationVersions.some(
+    (version) => version.id === currentDocumentationVersion.id,
+  )
+)
+  failures.push("Current version is not available");
+if (currentDocumentationVersion.packageVersion !== "1.0.0")
+  failures.push("Current docs/package version invariant failed");
+if (documentationVersions.some((version) => version.id === "v100"))
+  failures.push("Invalid normalized version ID v100");
+if (existsSync(join(root, "src/content/docs/docs/v1.0.0")))
+  failures.push("Duplicate v1.0.0 content tree");
 const required = [
   "src/data/catalogue.ts",
   "src/playground",
-  "src/content/docs/layout/container.mdx",
-  "src/content/docs/layout/stack.mdx",
-  "src/content/docs/layout/inline.mdx",
-  "src/content/docs/layout/cluster.mdx",
-  "src/content/docs/layout/grid.mdx",
+  "src/content/snapshots/v1.0.0/layout/container.mdx",
+  "src/content/snapshots/v1.0.0/layout/stack.mdx",
+  "src/content/snapshots/v1.0.0/layout/inline.mdx",
+  "src/content/snapshots/v1.0.0/layout/cluster.mdx",
+  "src/content/snapshots/v1.0.0/layout/grid.mdx",
 ];
 
 for (const path of required)
@@ -55,7 +80,23 @@ if (failures.length) {
   console.error(failures.map((failure) => `FAIL: ${failure}`).join("\n"));
   process.exitCode = 1;
 } else {
-  console.log(
-    `PASS: standalone documentation contract (${relative(root, join(root, "src"))})`,
+  const canonicalRoot = join(root, "dist/docs/v1.0.0/index.html");
+  const canonicalDeep = join(
+    root,
+    "dist/docs/v1.0.0/components/actions/button/index.html",
   );
+  const accidental = join(root, "dist/docs/v100/index.html");
+  if (
+    existsSync(join(root, "dist")) &&
+    (!existsSync(canonicalRoot) ||
+      !existsSync(canonicalDeep) ||
+      existsSync(accidental))
+  ) {
+    console.error("FAIL: built version route invariant failed");
+    process.exitCode = 1;
+  } else {
+    console.log(
+      `PASS: standalone documentation contract; canonical=${docsRoute(currentDocumentationVersion)} latest=${latestRoute()}`,
+    );
+  }
 }

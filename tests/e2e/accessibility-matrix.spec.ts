@@ -3,21 +3,21 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 const routes = [
-  ["Accordion", "/components/disclosure/accordion/"],
-  ["Checkbox", "/components/forms/checkbox/"],
-  ["RadioGroup", "/components/forms/radio-group/"],
-  ["Switch", "/components/forms/switch/"],
-  ["Slider", "/components/forms/slider/"],
-  ["Select", "/components/forms/select/"],
-  ["Tabs", "/components/navigation/tabs/"],
-  ["Dialog", "/components/overlays/dialog/"],
-  ["Drawer / Sheet", "/components/overlays/drawer/"],
-  ["DropdownMenu", "/components/overlays/dropdown-menu/"],
-  ["Popover", "/components/overlays/popover/"],
-  ["Tooltip", "/components/overlays/tooltip/"],
-  ["Toast", "/components/feedback/toast/"],
-  ["Toggle", "/components/actions/toggle/"],
-  ["ToggleGroup", "/components/actions/toggle-group/"],
+  ["Accordion", "/docs/latest/components/disclosure/accordion/"],
+  ["Checkbox", "/docs/latest/components/forms/checkbox/"],
+  ["RadioGroup", "/docs/latest/components/forms/radio-group/"],
+  ["Switch", "/docs/latest/components/forms/switch/"],
+  ["Slider", "/docs/latest/components/forms/slider/"],
+  ["Select", "/docs/latest/components/forms/select/"],
+  ["Tabs", "/docs/latest/components/navigation/tabs/"],
+  ["Dialog", "/docs/latest/components/overlays/dialog/"],
+  ["Drawer / Sheet", "/docs/latest/components/overlays/drawer/"],
+  ["DropdownMenu", "/docs/latest/components/overlays/dropdown-menu/"],
+  ["Popover", "/docs/latest/components/overlays/popover/"],
+  ["Tooltip", "/docs/latest/components/overlays/tooltip/"],
+  ["Toast", "/docs/latest/components/feedback/toast/"],
+  ["Toggle", "/docs/latest/components/actions/toggle/"],
+  ["ToggleGroup", "/docs/latest/components/actions/toggle-group/"],
 ] as const;
 
 async function exercise(page: Page, family: string): Promise<void> {
