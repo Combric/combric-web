@@ -1,0 +1,40 @@
+{
+  "name": "@combric/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "astro build",
+    "check": "astro check",
+    "dev": "astro dev",
+    "format:check": "prettier --check . --ignore-path .gitignore",
+    "lint": "eslint .",
+    "typecheck": "astro check",
+    "validate": "node scripts/validate-docs.mjs",
+    "preview": "astro preview",
+    "preview:test": "node scripts/serve-dist.mjs",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@astrojs/react": "6.0.6",
+    "@astrojs/starlight": "0.42.3",
+    "@combric/layout": "1.0.0",
+    "@combric/react": "1.0.0",
+    "@combric/tailwind": "1.0.0",
+    "@combric/tokens": "1.0.0",
+    "astro": "7.3.3",
+    "colorjs.io": "0.7.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.6",
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.1",
+    "prettier": "3.6.2",
+    "typescript": "5.9.3"
+  }
+}

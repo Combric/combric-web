@@ -1,42 +1,24 @@
 # Combric Web
 
-Official website, versioned documentation, interactive component catalogue, playground, and reference implementation for the **Combric UI Framework**.
+Official Combric website, documentation, component catalogue, Playground, and
+reference consumer. This standalone application consumes the published public
+Combric packages (`1.0.0`) and never depends on the framework repository.
 
-## Purpose
+## Local development
 
-Combric Web is the public documentation and testing surface for Combric.
+Requires Node 24 and pnpm 10.
 
-It provides:
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm validate
+pnpm build
+pnpm test:e2e
+```
 
-- Versioned framework documentation
-- Interactive component catalogue
-- Native CSS and Tailwind examples
-- Layout and design-token documentation
-- Component playground
-- CLI and Guard documentation
-- Accessibility and browser testing surfaces
-- Real-world reference implementation of published `@combric/*` packages
+The site preserves native CSS as the primary path; Tailwind remains optional.
+Production hosting/domain selection is intentionally outside this milestone.
 
-## Architecture
-
-Combric is split into three distinct projects:
-
-- **Combric Framework** — open-source framework and npm packages
-- **Combric Web** — public website, documentation, playground, and reference consumer
-- **Combric Studio** — future commercial development environment
-
-Combric Web consumes the public Combric packages as a real external application rather than acting as the source of the framework itself.
-
-## Framework
-
-The Combric Framework is free and open source under the MIT License.
-
-Repository:
-
-https://github.com/Combric/combric
-
-## Status
-
-Combric Web is under active development.
-
-The current stable framework release is **Combric v1.0.0**.
+Set `COMBRIC_DOCS_SITE_URL` to the approved canonical origin when building a
+hosted release. Starlight uses that origin for canonical metadata and the
+sitemap. No production domain is assumed in local or pull-request builds.
