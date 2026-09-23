@@ -1,0 +1,74 @@
+---
+import { getCollection, render } from "astro:content";
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import {
+  currentDocumentationVersion,
+  documentationVersions,
+  docsRoute,
+} from "../../../data/versions";
+import "../../../styles/docs.css";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const snapshots = await getCollection("snapshots");
+  return documentationVersions.map((version) => {
+    const normalizedVersionId = version.id.replaceAll(".", "");
+    const entry = snapshots.find(
+      (candidate) =>
+        candidate.id === version.id || candidate.id === normalizedVersionId,
+    );
+    if (!entry)
+      throw new Error(`Missing documentation snapshot for ${version.id}`);
+    return { params: { version: version.id }, props: { entry, version } };
+  });
+}
+
+const { entry, version } = Astro.props;
+const { Content } = await render(entry);
+const frontmatter = {
+  ...entry.data,
+  editUrl:
+    typeof entry.data.editUrl === "string"
+      ? entry.data.editUrl
+      : (false as false),
+};
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="canonical" href={docsRoute(version)} />
+    <title>{entry.data.title} — Combric {version.label}</title>
+  </head>
+  <body>
+    <StarlightPage frontmatter={frontmatter}>
+      <div
+        class="combric-version-header"
+        role="region"
+        aria-label="Documentation version selector"
+      >
+        <a href={docsRoute(currentDocumentationVersion)}>Combric</a>
+        <label>
+          <span>Documentation version</span>
+          <select
+            aria-label="Documentation version"
+            onchange={`window.location.href=this.value`}
+          >
+            {documentationVersions.map((option) => (
+              <option
+                value={docsRoute(option)}
+                selected={option.id === version.id}
+              >
+                {option.label} —{" "}
+                {option.status === "current" ? "Current" : "Previous"}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <Content />
+    </StarlightPage>
+  </body>
+</html>

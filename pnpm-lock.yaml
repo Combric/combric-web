@@ -40,7 +40,7 @@ importers:
     devDependencies:
       "@astrojs/check":
         specifier: 0.9.6
-        version: 0.9.6(@emnapi/runtime@1.11.3)(prettier@3.6.2)(typescript@5.9.3)
+        version: 0.9.6(@emnapi/runtime@1.11.3)(prettier-plugin-astro@1.0.1(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(prettier@3.6.2))(prettier@3.6.2)(typescript@5.9.3)
       "@axe-core/playwright":
         specifier: 4.13.0
         version: 4.13.0(playwright-core@1.63.0)
@@ -59,11 +59,20 @@ importers:
       prettier:
         specifier: 3.6.2
         version: 3.6.2
+      prettier-plugin-astro:
+        specifier: ^1.0.1
+        version: 1.0.1(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(prettier@3.6.2)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
 
 packages:
+  "@prettier/parse-srcset@3.1.0":
+    resolution:
+      {
+        integrity: sha512-FIRv2rZotO9NP/r66taYqD1zICpPiBbrECqjKV/xqNotqDxF7fLzzUeK+1RSRx9Tenk0DajR/GcRmTJ2qtHaKQ==,
+      }
+
   "@astrojs/astro2tsx@0.1.1":
     resolution:
       {
@@ -3502,6 +3511,33 @@ packages:
     engines: { node: ">=14" }
     hasBin: true
 
+  "prettier-plugin-astro@1.0.1":
+    resolution:
+      {
+        integrity: sha512-FKLtmNgyAoUbUixxmgkyO9ZMjEWCpHgMLtci8IakhCIzr8b+ML9YssBqsMfNoDdd/iE27BixwBZSq2amWDwpFQ==,
+      }
+    engines: { node: ">=22.12.0" }
+    peerDependencies:
+      prettier: ^3.5.3
+
+  "s.color@0.0.15":
+    resolution:
+      {
+        integrity: sha512-AUNrbEUHeKY8XsYr/DYpl+qk5+aM+DChopnWOPEzn8YKzOhv4l2zH6LzZms3tOZP3wwdOyc0RmTciyi46HLIuA==,
+      }
+
+  "sass-formatter@0.8.0":
+    resolution:
+      {
+        integrity: sha512-Nf4eMGE2O5vnJG7KPCRyksWS9gVKSYoUWtPeMXRRxwZSPVQhSGtL602xVYS65LvMkHmkvKa7xpauF0+/5pPwrg==,
+      }
+
+  "suf-log@2.5.3":
+    resolution:
+      {
+        integrity: sha512-KvC8OPjzdNOe+xQ4XWJV2whQA0aM1kGVczMQ8+dStAO6KfEB140JEVQ9dE76ONZ0/Ylf67ni4tILPJB41U0eow==,
+      }
+
   prettier@3.9.9:
     resolution:
       {
@@ -4412,9 +4448,9 @@ snapshots:
     transitivePeerDependencies:
       - "@emnapi/runtime"
 
-  "@astrojs/check@0.9.6(@emnapi/runtime@1.11.3)(prettier@3.6.2)(typescript@5.9.3)":
+  "@astrojs/check@0.9.6(@emnapi/runtime@1.11.3)(prettier-plugin-astro@1.0.1(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(prettier@3.6.2))(prettier@3.6.2)(typescript@5.9.3)":
     dependencies:
-      "@astrojs/language-server": 2.17.1(@emnapi/runtime@1.11.3)(prettier@3.6.2)(typescript@5.9.3)
+      "@astrojs/language-server": 2.17.1(@emnapi/runtime@1.11.3)(prettier-plugin-astro@1.0.1(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(prettier@3.6.2))(prettier@3.6.2)(typescript@5.9.3)
       chokidar: 4.0.3
       kleur: 4.1.5
       typescript: 5.9.3
@@ -4514,6 +4550,32 @@ snapshots:
       vscode-uri: 3.2.0
     optionalDependencies:
       prettier: 3.6.2
+    transitivePeerDependencies:
+      - "@emnapi/runtime"
+      - typescript
+
+  "@astrojs/language-server@2.17.1(@emnapi/runtime@1.11.3)(prettier-plugin-astro@1.0.1(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(prettier@3.6.2))(prettier@3.6.2)(typescript@5.9.3)":
+    dependencies:
+      "@astrojs/astro2tsx": 0.1.1(@emnapi/runtime@1.11.3)
+      "@astrojs/yaml2ts": 0.2.4
+      "@volar/kit": 2.4.28(typescript@5.9.3)
+      "@volar/language-core": 2.4.28
+      "@volar/language-server": 2.4.28
+      "@volar/language-service": 2.4.28
+      muggle-string: 0.4.1
+      tinyglobby: 0.2.17
+      volar-service-css: 0.0.71(@volar/language-service@2.4.28)
+      volar-service-emmet: 0.0.71(@volar/language-service@2.4.28)
+      volar-service-html: 0.0.71(@volar/language-service@2.4.28)
+      volar-service-prettier: 0.0.71(@volar/language-service@2.4.28)(prettier@3.6.2)
+      volar-service-typescript: 0.0.71(@volar/language-service@2.4.28)
+      volar-service-typescript-twoslash-queries: 0.0.71(@volar/language-service@2.4.28)
+      volar-service-yaml: 0.0.71(@volar/language-service@2.4.28)
+      vscode-html-languageservice: 5.6.2
+      vscode-uri: 3.2.0
+    optionalDependencies:
+      prettier: 3.6.2
+      prettier-plugin-astro: 1.0.1(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(prettier@3.6.2)
     transitivePeerDependencies:
       - "@emnapi/runtime"
       - typescript
@@ -6558,6 +6620,28 @@ snapshots:
       source-map-js: 1.2.1
 
   prelude-ls@1.2.1: {}
+
+  "prettier-plugin-astro@1.0.1(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(prettier@3.6.2)":
+    dependencies:
+      "@astrojs/compiler-rs": 0.4.1(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)
+      "@prettier/parse-srcset": 3.1.0
+      sass-formatter: 0.8.0
+    transitivePeerDependencies:
+      - "@emnapi/core"
+      - "@emnapi/runtime"
+      - prettier
+
+  "sass-formatter@0.8.0":
+    dependencies:
+      suf-log: 2.5.3
+
+  "suf-log@2.5.3":
+    dependencies:
+      s.color: 0.0.15
+
+  "s.color@0.0.15": {}
+
+  "@prettier/parse-srcset@3.1.0": {}
 
   prettier@3.6.2: {}
 

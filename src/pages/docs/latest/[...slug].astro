@@ -1,0 +1,39 @@
+---
+import { currentDocumentationVersion, docsRoute } from "../../../data/versions";
+import { readdirSync } from "node:fs";
+import { join, relative } from "node:path";
+
+export const prerender = true;
+export function getStaticPaths() {
+  const root = join(
+    process.cwd(),
+    "src/content/snapshots",
+    currentDocumentationVersion.id,
+  );
+  const paths: { params: { slug: string | undefined } }[] = [];
+  const visit = (directory: string) => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const full = join(directory, entry.name);
+      if (entry.isDirectory()) visit(full);
+      else if (entry.name.endsWith(".mdx")) {
+        const route = relative(root, full)
+          .replace(/\\/g, "/")
+          .replace(/\.mdx$/, "")
+          .replace(/\/index$/, "");
+        paths.push({ params: { slug: route || undefined } });
+      }
+    }
+  };
+  visit(root);
+  return paths;
+}
+
+const slug = Astro.params.slug ?? "";
+const destination = docsRoute(currentDocumentationVersion, slug);
+---
+
+<meta http-equiv="refresh" content={`0;url=${destination}`} />
+<link rel="canonical" href={destination} />
+<p>
+  Redirecting to <a href={destination}>the current Combric documentation</a>.
+</p>

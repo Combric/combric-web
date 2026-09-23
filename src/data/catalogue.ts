@@ -675,3 +675,19 @@ export const repositorySourceBase =
 export function sourceUrl(source: string): string {
   return `${repositorySourceBase}${source}`;
 }
+
+export function catalogueRoute(
+  version: DocumentationVersion,
+  entry: CatalogueEntry,
+): string {
+  return docsRoute(version, entry.route);
+}
+
+export function layoutRoute(
+  version: DocumentationVersion,
+  entry: LayoutEntry,
+): string {
+  return docsRoute(version, entry.route);
+}
+import type { DocumentationVersion } from "./versions";
+import { docsRoute } from "./versions";

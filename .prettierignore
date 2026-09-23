@@ -1,0 +1,9 @@
+# pnpm owns this generated dependency graph; formatting it with Prettier would
+# create lockfile churn unrelated to source formatting.
+pnpm-lock.yaml
+
+# Generated build and test output is not source governed by Prettier.
+node_modules/
+dist/
+.astro/
+test-results/

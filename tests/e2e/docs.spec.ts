@@ -16,7 +16,7 @@ test("desktop navigation and ordinary component documentation work", async ({
   await expect(
     page.getByRole("heading", { level: 1, name: "Combric" }),
   ).toBeVisible();
-  await page.goto("/components/actions/button/");
+  await page.goto("/docs/latest/components/actions/button/");
   await expect(
     page.getByRole("heading", { level: 1, name: "Button" }),
   ).toBeVisible();
@@ -29,7 +29,7 @@ test("desktop navigation and ordinary component documentation work", async ({
 });
 
 test("dialog keyboard dismissal restores focus", async ({ page }) => {
-  await page.goto("/components/overlays/dialog/");
+  await page.goto("/docs/latest/components/overlays/dialog/");
   const trigger = page.getByRole("button", { name: "Open dialog" });
   await trigger.click();
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -40,7 +40,7 @@ test("dialog keyboard dismissal restores focus", async ({ page }) => {
 });
 
 test("Color Map exposes canonical and derived data", async ({ page }) => {
-  await page.goto("/foundations/colors/");
+  await page.goto("/docs/latest/foundations/colors/");
   await expect(
     page.getByRole("heading", { name: "Primitive palette" }),
   ).toBeVisible();
@@ -74,6 +74,31 @@ test("Playground controls update code and viewport", async ({ page }) => {
   await expectNoAxeViolations(page);
 });
 
+test("versioned documentation, latest routing and selector preserve deep paths", async ({
+  page,
+}) => {
+  await page.goto("/docs/v1.0.0/");
+  await expect(
+    page.getByRole("combobox", { name: "Documentation version" }),
+  ).toHaveValue("/docs/v1.0.0/");
+  await expect(
+    page.getByRole("option", { name: /v1\.0\.0.*Current/ }),
+  ).toHaveCount(1);
+
+  await page.goto("/docs/latest/components/actions/button/");
+  await expect(page).toHaveURL(
+    /\/docs\/v1\.0\.0\/components\/actions\/button\/?$/,
+  );
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Button" }),
+  ).toBeVisible();
+
+  await page.goto("/docs/v9.9.9/components/actions/button/");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Page not found" }),
+  ).toBeVisible();
+});
+
 test("unknown routes use the accessible 404 page", async ({ page }) => {
   const response = await page.goto("/not-a-real-combric-route/");
   expect(response?.status()).toBe(404);
@@ -86,7 +111,7 @@ test.describe("mobile documentation", () => {
   test.skip(({ isMobile }) => !isMobile, "mobile project only");
 
   test("mobile navigation opens and remains accessible", async ({ page }) => {
-    await page.goto("/getting-started/");
+    await page.goto("/docs/latest/getting-started/");
     const menu = page.getByRole("button", { name: /menu/i }).first();
     await menu.click();
     await expect(
