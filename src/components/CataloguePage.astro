@@ -42,7 +42,7 @@ if (!example) throw new Error(`Missing example for catalogue slug: ${slug}`);
   {slug === "toast" ? (
     <ExampleRenderer slug={slug} client:load />
   ) : (
-    <ExampleRenderer slug={slug} client:visible />
+    <ExampleRenderer slug={slug} client:load />
   )}
 </div>
 
