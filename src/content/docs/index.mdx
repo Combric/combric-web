@@ -1,0 +1,36 @@
+---
+title: Combric
+description: Package-first, native-first UI framework documentation.
+template: splash
+hero:
+  tagline:
+    A performance-first UI framework built on canonical tokens, standard CSS,
+    native semantics, and React 19.
+  actions:
+    - text: Get started
+      link: /getting-started/
+      icon: right-arrow
+    - text: Browse components
+      link: /components/actions/button/
+      variant: minimal
+---
+
+<div class="combric-docs-status">
+  <strong>Stable 1.0.0 documentation.</strong> The six public Combric packages
+  are published and consumed here as registry artifacts.
+</div>
+
+## Architecture
+
+Combric is package-first. Standard CSS is a primary consumer path, React
+components do not require Tailwind, and the Tailwind v4 adapter is optional.
+
+- `@combric/tokens` — canonical typed tokens and generated CSS properties.
+- `@combric/layout` — framework-independent Grid and Flexbox primitives.
+- `@combric/react` — native-first accessible React components.
+- `@combric/tailwind` — optional semantic Tailwind v4 adapter.
+
+## Release state
+
+The component catalogue, CLI, and read-only Guard contracts are part of the
+stable 1.0.0 release. Combric Studio is outside this release.

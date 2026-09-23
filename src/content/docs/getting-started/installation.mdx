@@ -1,0 +1,36 @@
+---
+title: Installation
+description: Stable package installation paths and current release-candidate status.
+---
+
+> These are the stable 1.0 installation contracts. The repository is release
+> candidate ready, but does not claim the packages currently exist on npm.
+
+## React components
+
+```sh
+npm install @combric/react react react-dom
+```
+
+React and React DOM `>=19.0.0 <20` are peer dependencies.
+
+## Tokens only
+
+```sh
+npm install @combric/tokens
+```
+
+## Framework-independent layout
+
+```sh
+npm install @combric/layout
+```
+
+## Optional Tailwind adapter
+
+```sh
+npm install @combric/tailwind tailwindcss
+```
+
+Tailwind CSS must satisfy `>=4.3.0 <5`. Combric does not require the CLI,
+Tailwind, or source-copy installation.
