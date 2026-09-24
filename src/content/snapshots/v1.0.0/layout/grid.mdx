@@ -4,5 +4,14 @@ description: Intrinsic responsive and bounded explicit grid layouts.
 ---
 
 import LayoutPage from "../../../../components/LayoutPage.astro";
+import StylingComparison from "../../../../components/StylingComparison.astro";
 
 <LayoutPage slug="grid" />
+
+## Native CSS and Tailwind adapter
+
+Both versions below use the same canonical Combric content. The native layout
+contract is intrinsically responsive; the Tailwind adapter maps its grid and
+spacing utilities to the same published tokens.
+
+<StylingComparison comparisonId="responsive-grid" />

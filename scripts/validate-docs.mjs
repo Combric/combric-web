@@ -45,6 +45,9 @@ const required = [
   "src/content/snapshots/v1.0.0/layout/inline.mdx",
   "src/content/snapshots/v1.0.0/layout/cluster.mdx",
   "src/content/snapshots/v1.0.0/layout/grid.mdx",
+  "src/content/snapshots/v1.0.0/foundations/colors.mdx",
+  "src/content/snapshots/v1.0.0/reference/packages.mdx",
+  "src/styles/tailwind-demos.css",
 ];
 
 for (const path of required)
@@ -85,16 +88,51 @@ for (const demo of catalogueDemoMetadata) {
     failures.push(
       `Demo ${demo.id} references an unavailable/non-current version`,
     );
-  if (!catalogueSlugs.has(demo.catalogueSlug))
-    failures.push(
-      `Demo ${demo.id} references unknown catalogue slug ${demo.catalogueSlug}`,
-    );
+  if (
+    (!demo.kind || demo.kind === "component") &&
+    !catalogueSlugs.has(demo.catalogueSlug)
+  )
+    failures.push(`Demo ${demo.id} references an unknown catalogue slug`);
+  if (demo.kind === "layout" && !demo.layoutSlug)
+    failures.push(`Layout demo ${demo.id} is missing its layout identity`);
+  if (demo.kind === "styling" && (!demo.comparisonId || !demo.approach))
+    failures.push(`Styling demo ${demo.id} is missing comparison metadata`);
   if (!demo.exampleKey || !demo.title.trim())
     failures.push(`Demo ${demo.id} is missing its example key or title`);
 }
 for (const slug of catalogueSlugs)
   if (!catalogueDemoMetadata.some((demo) => demo.catalogueSlug === slug))
     failures.push(`Catalogue family has no canonical demo: ${slug}`);
+const layoutSlugs = new Set([
+  "container",
+  "stack",
+  "inline",
+  "cluster",
+  "grid",
+]);
+for (const slug of layoutSlugs)
+  if (
+    !catalogueDemoMetadata.some(
+      (demo) => demo.kind === "layout" && demo.layoutSlug === slug,
+    )
+  )
+    failures.push(`Layout ${slug} has no canonical demo`);
+for (const comparisonId of ["foundation-surface", "responsive-grid"])
+  for (const approach of ["native-css", "tailwind"])
+    if (
+      !catalogueDemoMetadata.some(
+        (demo) =>
+          demo.kind === "styling" &&
+          demo.comparisonId === comparisonId &&
+          demo.approach === approach,
+      )
+    )
+      failures.push(`Incomplete ${comparisonId} comparison: ${approach}`);
+if (
+  existsSync(join(root, "src/examples/layout-examples.tsx")) ||
+  existsSync(join(root, "src/examples/LayoutExampleRenderer.tsx"))
+)
+  failures.push("Parallel layout example registry/renderer must not remain");
 const metadataScenarios = catalogueDemoMetadata
   .map((demo) => demo.testScenario)
   .filter(Boolean);
@@ -196,6 +234,12 @@ if (failures.length) {
     root,
     "dist/components/actions/button/index.html",
   );
+  const builtCss = existsSync(join(root, "dist"))
+    ? readdirSync(join(root, "dist/_astro"))
+        .filter((file) => file.endsWith(".css"))
+        .map((file) => readFileSync(join(root, "dist/_astro", file), "utf8"))
+        .join("\n")
+    : "";
   if (
     existsSync(join(root, "dist")) &&
     (!existsSync(canonicalRoot) ||
@@ -207,6 +251,16 @@ if (failures.length) {
     console.error("FAIL: built version route invariant failed");
     process.exitCode = 1;
   } else {
+    if (
+      builtCss &&
+      (!builtCss.includes(".grid-combric-auto-sm") ||
+        !builtCss.includes("--combric-space-3"))
+    ) {
+      console.error(
+        "FAIL: built Tailwind adapter utilities/tokens are missing",
+      );
+      process.exitCode = 1;
+    }
     console.log(
       `PASS: standalone documentation contract; canonical=${docsRoute(currentDocumentationVersion)} latest=${latestRoute()}`,
     );

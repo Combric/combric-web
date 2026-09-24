@@ -102,6 +102,7 @@ import {
   TooltipTrigger,
 } from "@combric/react";
 import type { ComponentType } from "react";
+import { Cluster, Container, Grid, Inline, Stack } from "@combric/react";
 import { catalogue } from "../data/catalogue";
 import { catalogueDemoMetadata } from "../data/catalogue-demos";
 import { currentDocumentationVersion } from "../data/versions";
@@ -624,12 +625,140 @@ export function Example() {
   return <EmptyState><EmptyStateTitle level={3}>No projects</EmptyStateTitle><EmptyStateDescription>Create a project to begin.</EmptyStateDescription><EmptyStateActions><Button>Create project</Button></EmptyStateActions></EmptyState>;
 }`,
   ),
+  "layout-container": define(
+    () => <Container size="prose">A readable prose-width container.</Container>,
+    `import { Container } from "@combric/react";
+
+export function Example() {
+  return <Container size="prose">A readable prose-width container.</Container>;
+}`,
+  ),
+  "layout-stack": define(
+    () => (
+      <Stack gap="3">
+        <div>First</div>
+        <div>Second</div>
+      </Stack>
+    ),
+    `import { Stack } from "@combric/react";
+
+export function Example() {
+  return <Stack gap="3"><div>First</div><div>Second</div></Stack>;
+}`,
+  ),
+  "layout-inline": define(
+    () => (
+      <Inline gap="3" align="baseline">
+        <strong>Project</strong>
+        <span>Ready</span>
+      </Inline>
+    ),
+    `import { Inline } from "@combric/react";
+
+export function Example() {
+  return <Inline gap="3" align="baseline"><strong>Project</strong><span>Ready</span></Inline>;
+}`,
+  ),
+  "layout-cluster": define(
+    () => (
+      <Cluster gap="2">
+        <button type="button">Save</button>
+        <button type="button">Cancel</button>
+        <button type="button">Preview</button>
+      </Cluster>
+    ),
+    `import { Cluster } from "@combric/react";
+
+export function Example() {
+  return <Cluster gap="2"><button type="button">Save</button><button type="button">Cancel</button><button type="button">Preview</button></Cluster>;
+}`,
+  ),
+  "layout-grid": define(
+    () => (
+      <Grid minItemWidth="sm" gap="3">
+        <article>First</article>
+        <article>Second</article>
+        <article>Third</article>
+      </Grid>
+    ),
+    `import { Grid } from "@combric/react";
+
+export function Example() {
+  return <Grid minItemWidth="sm" gap="3"><article>First</article><article>Second</article><article>Third</article></Grid>;
+}`,
+  ),
+  "foundation-native-css": define(
+    () => <article className="surface">Canonical token surface</article>,
+    `@import "@combric/tokens/css";
+
+.surface {
+  color: var(--combric-color-text);
+  background: var(--combric-color-surface);
+  border: var(--combric-border-width) solid var(--combric-color-border);
+  padding: var(--combric-space-4);
+  border-radius: var(--combric-radius);
+}
+
+<article class="surface">Canonical token surface</article>`,
+  ),
+  "foundation-tailwind": define(
+    () => (
+      <article className="border-combric border-combric-border bg-combric-surface p-combric-4 text-combric-foreground rounded-combric">
+        Canonical token surface
+      </article>
+    ),
+    `@import "tailwindcss/theme.css" layer(theme);
+@import "@combric/tailwind";
+@import "tailwindcss/utilities.css" layer(utilities);
+
+<article class="border-combric border-combric-border bg-combric-surface p-combric-4 text-combric-foreground rounded-combric">
+  Canonical token surface
+</article>`,
+  ),
+  "grid-native-css": define(
+    () => (
+      <div className="combric-grid" data-min-item-width="sm" data-gap="3">
+        <article>First</article>
+        <article>Second</article>
+        <article>Third</article>
+      </div>
+    ),
+    `@import "@combric/layout/css";
+
+<div class="combric-grid" data-min-item-width="sm" data-gap="3">
+  <article>First</article>
+  <article>Second</article>
+  <article>Third</article>
+</div>`,
+  ),
+  "grid-tailwind": define(
+    () => (
+      <div className="grid grid-combric-auto-sm gap-combric-3">
+        <article>First</article>
+        <article>Second</article>
+        <article>Third</article>
+      </div>
+    ),
+    `@import "tailwindcss/theme.css" layer(theme);
+@import "@combric/tailwind";
+@import "tailwindcss/utilities.css" layer(utilities);
+
+<div class="grid grid-combric-auto-sm gap-combric-3">
+  <article>First</article>
+  <article>Second</article>
+  <article>Third</article>
+</div>`,
+  ),
 };
 
 export interface CanonicalCatalogueDemo extends ExampleDefinition {
   readonly id: string;
   readonly version: string;
-  readonly catalogueSlug: string;
+  readonly kind?: "component" | "layout" | "styling";
+  readonly catalogueSlug?: string;
+  readonly layoutSlug?: string;
+  readonly comparisonId?: string;
+  readonly approach?: "native-css" | "tailwind";
   readonly title: string;
   readonly testScenario?: string;
 }
@@ -638,12 +767,15 @@ export const canonicalCatalogueDemos: readonly CanonicalCatalogueDemo[] =
   Object.freeze(
     catalogueDemoMetadata.map((metadata) => {
       const example = componentExamples[metadata.exampleKey];
-      const component = catalogue.find(
-        (item) => item.slug === metadata.catalogueSlug,
-      );
+      const validTarget =
+        metadata.kind === "layout"
+          ? Boolean(metadata.layoutSlug)
+          : metadata.kind === "styling"
+            ? Boolean(metadata.comparisonId && metadata.approach)
+            : catalogue.some((item) => item.slug === metadata.catalogueSlug);
       if (
         !example ||
-        !component ||
+        !validTarget ||
         metadata.version !== currentDocumentationVersion.id
       )
         throw new Error(`Invalid canonical demo metadata: ${metadata.id}`);
@@ -657,7 +789,25 @@ export const canonicalCatalogueDemos: readonly CanonicalCatalogueDemo[] =
 
 export function catalogueDemosFor(version: string, slug: string) {
   return canonicalCatalogueDemos.filter(
-    (demo) => demo.version === version && demo.catalogueSlug === slug,
+    (demo) =>
+      demo.version === version &&
+      (demo.kind ?? "component") === "component" &&
+      demo.catalogueSlug === slug,
+  );
+}
+
+export function layoutDemosFor(version: string, slug: string) {
+  return canonicalCatalogueDemos.filter(
+    (demo) =>
+      demo.version === version &&
+      demo.kind === "layout" &&
+      demo.layoutSlug === slug,
+  );
+}
+
+export function stylingDemosFor(comparisonId: string) {
+  return canonicalCatalogueDemos.filter(
+    (demo) => demo.kind === "styling" && demo.comparisonId === comparisonId,
   );
 }
 
