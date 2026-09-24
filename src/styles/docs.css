@@ -8,12 +8,15 @@
   --sl-font-mono: var(--combric-font-family-code);
 }
 
-html {
+:root[data-theme="light"] {
   color-scheme: light;
 }
 
-starlight-theme-select {
-  display: none;
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --sl-color-accent-low: #172554;
+  --sl-color-accent: #93c5fd;
+  --sl-color-accent-high: #dbeafe;
 }
 
 .combric-docs-status {

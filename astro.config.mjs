@@ -32,8 +32,29 @@ export default defineConfig({
     starlight({
       title: "Combric",
       description: "Package-first UI framework documentation",
+      logo: {
+        src: "./src/assets/brand/combric-logo.png",
+        alt: "Combric mark",
+      },
       customCss: ["./src/styles/docs.css", "./src/styles/tailwind-demos.css"],
-      pagefind: false,
+      pagefind: true,
+      head: [
+        {
+          tag: "script",
+          content: `(() => {
+            const labelSearchInput = () => {
+              document
+                .querySelectorAll("input.pagefind-ui__search-input:not([aria-label])")
+                .forEach((input) => input.setAttribute("aria-label", "Search documentation"));
+            };
+            labelSearchInput();
+            new MutationObserver(labelSearchInput).observe(document.documentElement, {
+              childList: true,
+              subtree: true,
+            });
+          })();`,
+        },
+      ],
       social: [
         {
           icon: "github",

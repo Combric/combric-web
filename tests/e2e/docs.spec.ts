@@ -44,6 +44,68 @@ test("desktop navigation and ordinary component documentation work", async ({
   await expectNoAxeViolations(page);
 });
 
+test("official brand mark is visible in the native documentation header", async ({
+  page,
+}) => {
+  await page.goto("/docs/v1.0.0/");
+  const homeLink = page.getByRole("link", { name: /Combric/ }).first();
+  await expect(homeLink).toHaveAttribute("href", "/");
+  await expect(
+    homeLink.getByRole("img", { name: "Combric mark" }),
+  ).toBeVisible();
+  await expectNoAxeViolations(page);
+});
+
+test("theme control supports light, dark, system preference and persistence", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "theme picker is a desktop header control");
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/docs/v1.0.0/");
+  const theme = page.getByRole("combobox", { name: "Select theme" });
+  await expect(theme).toBeVisible();
+  await expect(theme.locator("option", { hasText: "System" })).toHaveCount(1);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await theme.selectOption("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await theme.selectOption("dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expectNoAxeViolations(page);
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await theme.selectOption("auto");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expectNoAxeViolations(page);
+});
+
+test("native search returns versioned documentation and navigates to the result", async ({
+  page,
+}) => {
+  await page.goto("/docs/v1.0.0/");
+  const searchButton = page.getByRole("button", { name: /search/i }).first();
+  await expect(searchButton).toBeVisible();
+  await searchButton.click();
+  const searchDialog = page.getByRole("dialog");
+  await expect(searchDialog).toBeVisible();
+  const searchInput = searchDialog.getByRole("textbox", {
+    name: "Search documentation",
+  });
+  await searchInput.fill("Guard");
+  const result = searchDialog.getByRole("link", { name: /Guard/ }).first();
+  await expect(result).toBeVisible();
+  await expect(result).toHaveAttribute(
+    "href",
+    /\/docs\/v1\.0\.0\/reference\/guard\//,
+  );
+  await expectNoAxeViolations(page);
+  await result.click();
+  await expect(page).toHaveURL(/\/docs\/v1\.0\.0\/reference\/guard\//);
+  await expect(page.getByText("@combric/guard@1.0.0").first()).toBeVisible();
+});
+
 test("dialog keyboard dismissal restores focus", async ({ page }) => {
   await page.goto("/docs/v1.0.0/components/overlays/dialog/");
   const trigger = page.getByRole("button", { name: "Open dialog" });
@@ -228,6 +290,17 @@ test.describe("mobile documentation", () => {
     await expect(
       page.getByRole("link", { name: "Installation", exact: true }),
     ).toBeVisible();
+    await expectNoAxeViolations(page);
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeFocused();
+  });
+
+  test("mobile search is available and accessible", async ({ page }) => {
+    await page.goto("/docs/v1.0.0/");
+    const search = page.getByRole("button", { name: /search/i }).first();
+    await expect(search).toBeVisible();
+    await search.click();
+    await expect(page.getByRole("dialog")).toBeVisible();
     await expectNoAxeViolations(page);
   });
 });
