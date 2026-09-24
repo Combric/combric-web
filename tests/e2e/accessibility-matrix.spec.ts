@@ -171,7 +171,8 @@ async function exercise(page: Page, scenario: string): Promise<void> {
     case "toggle": {
       const control = page.getByRole("button", { name: "Pin project" });
       await expect(control).toHaveAttribute("aria-pressed", "true");
-      await control.press("Space");
+      await control.focus();
+      await page.keyboard.press("Space");
       await expect(control).toHaveAttribute("aria-pressed", "false");
       break;
     }

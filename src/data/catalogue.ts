@@ -65,7 +65,7 @@ export const catalogue = Object.freeze([
       "Uses a native button and exposes pressed state through aria-pressed.",
     keyboard: "Native Enter and Space activation.",
     source: "packages/react/src/toggle.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "toggle-group",
@@ -83,7 +83,7 @@ export const catalogue = Object.freeze([
     keyboard:
       "Arrow keys move focus by orientation; Home and End move to boundaries without selecting.",
     source: "packages/react/src/toggle.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "label",
@@ -132,7 +132,7 @@ export const catalogue = Object.freeze([
       "Preserves native checkbox semantics and form participation; no indeterminate abstraction is added.",
     keyboard: "Native Space toggling.",
     source: "packages/react/src/form-controls.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "radio-group",
@@ -145,7 +145,7 @@ export const catalogue = Object.freeze([
       "Uses native radio inputs and fieldset disabled propagation; provide a group label.",
     keyboard: "Native browser radio-group arrow and Space behavior.",
     source: "packages/react/src/form-controls.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "switch",
@@ -171,7 +171,7 @@ export const catalogue = Object.freeze([
       "Preserves native selection, keyboard, validation, and form semantics.",
     keyboard: "Platform-native select behavior.",
     source: "packages/react/src/form-controls.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "slider",
@@ -184,7 +184,7 @@ export const catalogue = Object.freeze([
       "Requires an accessible name and preserves native form, validation, and range semantics.",
     keyboard: "Platform-native range keyboard behavior.",
     source: "packages/react/src/form-controls.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "field",
@@ -388,7 +388,7 @@ export const catalogue = Object.freeze([
       "Native buttons and stable IDs connect expanded state, controls, and labelled regions.",
     keyboard: "Native button Enter and Space behavior.",
     source: "packages/react/src/accordion.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "collapsible",
@@ -460,7 +460,7 @@ export const catalogue = Object.freeze([
       "Reuses Dialog modal isolation, focus trap, dismissal, naming, and restoration behavior.",
     keyboard: "Tab/Shift+Tab cycle; Escape closes and restores trigger focus.",
     source: "packages/react/src/drawer.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "dropdown-menu",
@@ -484,7 +484,7 @@ export const catalogue = Object.freeze([
     keyboard:
       "Arrow keys wrap; Home/End move; Enter/Space select; Escape restores focus; Tab closes.",
     source: "packages/react/src/dropdown-menu.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "popover",
@@ -498,7 +498,7 @@ export const catalogue = Object.freeze([
     keyboard:
       "Escape closes and restores trigger focus; outside pointer interaction dismisses without stealing focus.",
     source: "packages/react/src/popover.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "tooltip",
@@ -511,7 +511,7 @@ export const catalogue = Object.freeze([
       "Uses role tooltip and aria-describedby, never moves focus, and requires non-interactive content.",
     keyboard: "Focus opens; blur or Escape closes.",
     source: "packages/react/src/tooltip.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "alert",
@@ -547,7 +547,7 @@ export const catalogue = Object.freeze([
     keyboard:
       "Close is a native button; notification itself does not capture focus.",
     source: "packages/react/src/toast.tsx",
-    playground: false,
+    playground: true,
   }),
   entry({
     slug: "progress",

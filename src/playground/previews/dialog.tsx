@@ -13,7 +13,7 @@ export default function Preview({
   readonly props: PlaygroundProps;
 }) {
   return (
-    <Dialog open={Boolean(props.open)} onOpenChange={() => undefined}>
+    <Dialog defaultOpen={Boolean(props.open)}>
       <DialogTrigger>Open dialog</DialogTrigger>
       <DialogContent>
         <DialogTitle>Confirm</DialogTitle>

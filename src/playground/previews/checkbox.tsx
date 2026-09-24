@@ -1,5 +1,6 @@
-import { Label, Switch } from "@combric/react";
+import { Checkbox, Label } from "@combric/react";
 import type { PlaygroundProps } from "../registry";
+
 export default function Preview({
   props,
 }: {
@@ -7,11 +8,11 @@ export default function Preview({
 }) {
   return (
     <Label>
-      <Switch
+      <Checkbox
         defaultChecked={Boolean(props.checked)}
         disabled={Boolean(props.disabled)}
       />{" "}
-      {String(props.text)}
+      {String(props.label)}
     </Label>
   );
 }

@@ -59,6 +59,12 @@ export function PreviewReceiver() {
         event.source !== window.parent
       )
         return;
+      if (
+        typeof event.data !== "object" ||
+        event.data === null ||
+        Array.isArray(event.data)
+      )
+        return;
       const data = event.data as {
         type?: unknown;
         family?: unknown;
@@ -89,7 +95,7 @@ export function PreviewReceiver() {
       resetKey={`${state.family}:${JSON.stringify(state.props)}`}
     >
       <Suspense fallback={<p>Loading preview…</p>}>
-        <Preview props={state.props} />
+        <Preview key={JSON.stringify(state.props)} props={state.props} />
       </Suspense>
     </PreviewErrorBoundary>
   );
