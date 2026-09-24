@@ -5,9 +5,16 @@ description:
   projects.
 ---
 
+<div class="combric-tool-docs">
+
 The `combric` CLI is optional. Install Combric as packages when you want direct
 control; use the CLI when you want it to configure an **existing** project. The
-The CLI and framework packages are stable `1.0.0` releases published on npm.
+CLI and framework packages are synchronized stable `1.0.0` releases published
+on npm. Install this snapshot's CLI with:
+
+```sh
+pnpm add --save-dev @combric/cli@1.0.0
+```
 
 ## Commands
 
@@ -20,10 +27,12 @@ combric init --mode react --css-file src/styles.css --dry-run
 combric init --mode react --css-file src/styles.css --yes
 ```
 
-`info` reports detected facts, including package-manager evidence, React,
-Tailwind, and declared Combric packages. `doctor` checks configuration health
-with pass, warning, and error findings. Both are read-only. They support human
-and valid JSON output; JSON errors include a code and exit status.
+`info` reports detected facts, including package-manager evidence, workspace,
+React, Tailwind, and declared Combric packages. `doctor` checks configuration
+health with pass, warning, and error findings. Both are read-only and support
+human or JSON output. JSON success responses use schema version `1`; errors
+include a stable code, message, and exit status. A warning-only `doctor` result
+is successful.
 
 ## Setup modes
 
@@ -35,11 +44,11 @@ and valid JSON output; JSON errors include a code and exit status.
 | `react-tailwind` | `tailwindcss`, `@combric/tailwind`, `@combric/react/css` | React plus optional adapter.          |
 
 Tailwind modes require an existing compatible Tailwind CSS `>=4.3 <5` project.
-The CLI does not convert a project to Tailwind. React modes use the real public
-React CSS entry and React 19 peer contract. The CLI adds missing required
-packages with the detected package manager. Because Combric packages are not yet
-published, external registry installation may fail; use a local tarball or
-workspace until release is separately approved.
+The CLI does not convert a project to Tailwind. React modes use the public React
+CSS entry and React 19 peer contract. The CLI adds missing required packages
+from the configured package registry using the detected package manager. The
+public Combric packages, including `@combric/cli@1.0.0`, are published; normal
+registry access is required for installation.
 
 ## Safe planning
 
@@ -51,8 +60,10 @@ select the intended member package with `--project` when packages are missing.
 
 `--dry-run` computes the actual plan without changing files or installing
 packages. `--dry-run --json` exposes the operation types, targets, reasons, and
-package list. Apply with `--yes`; there is no TTY prompt to hang automation.
-Repeated setup does not duplicate imports or rewrite an unchanged config.
+package list. Apply with `--yes`; setup never opens a TTY prompt. If neither
+flag is supplied when changes are needed, it exits with a usage/configuration
+error and explains how to proceed. Repeated setup does not duplicate imports
+or rewrite an unchanged config.
 
 ## Config and exits
 
@@ -63,6 +74,10 @@ untouched. Exit `0` means success (doctor warnings may remain), `1` means a
 request/configuration or doctor error, and `2` means an operational failure.
 
 The CLI does not scaffold applications, copy components, run consumer project
-code for inspection, send telemetry, or check for updates. On Windows, invoke
-setup through the selected package manager, such as `pnpm exec combric`, so its
-executable can be spawned safely.
+code for inspection, send telemetry, or check for updates. `info` and `doctor`
+are local-only. On Windows, invoke setup through the selected package manager,
+such as `pnpm exec combric`, so its executable can be spawned safely. Supported
+package-manager names are `pnpm`, `npm`, `yarn`, and `bun`; resolve conflicting
+project evidence manually before setup.
+
+</div>

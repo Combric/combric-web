@@ -46,7 +46,10 @@ const required = [
   "src/content/snapshots/v1.0.0/layout/cluster.mdx",
   "src/content/snapshots/v1.0.0/layout/grid.mdx",
   "src/content/snapshots/v1.0.0/foundations/colors.mdx",
+  "src/content/snapshots/v1.0.0/getting-started/cli.mdx",
+  "src/content/snapshots/v1.0.0/getting-started/installation.mdx",
   "src/content/snapshots/v1.0.0/reference/packages.mdx",
+  "src/content/snapshots/v1.0.0/reference/guard.mdx",
   "src/styles/tailwind-demos.css",
 ];
 
@@ -57,6 +60,46 @@ for (const path of required)
 const packageJson = JSON.parse(
   readFileSync(join(root, "package.json"), "utf8"),
 );
+const cliDocs = readFileSync(
+  join(root, "src/content/snapshots/v1.0.0/getting-started/cli.mdx"),
+  "utf8",
+);
+const guardDocs = readFileSync(
+  join(root, "src/content/snapshots/v1.0.0/reference/guard.mdx"),
+  "utf8",
+);
+const installationDocs = readFileSync(
+  join(root, "src/content/snapshots/v1.0.0/getting-started/installation.mdx"),
+  "utf8",
+);
+for (const [name, version] of Object.entries(packageJson.dependencies ?? {})) {
+  if (name.startsWith("@combric/") && version !== "1.0.0")
+    failures.push(`Installed public package version drift: ${name}@${version}`);
+}
+if (
+  !cliDocs.includes("@combric/cli@1.0.0") ||
+  !cliDocs.includes("published") ||
+  /not yet published|local tarball or\s+workspace until release/i.test(cliDocs)
+)
+  failures.push("CLI docs do not describe the published 1.0.0 package truth");
+if (
+  !guardDocs.includes("@combric/guard@1.0.0") ||
+  !guardDocs.includes("GUARD_SCAN_SKIPPED") ||
+  !guardDocs.includes("GUARD_TOKEN_UNKNOWN")
+)
+  failures.push(
+    "Guard docs are missing the published version or rule contract",
+  );
+if (
+  !installationDocs.includes("@combric/react@1.0.0") ||
+  !installationDocs.includes("@combric/tokens@1.0.0") ||
+  !installationDocs.includes("@combric/layout@1.0.0") ||
+  !installationDocs.includes("@combric/tailwind@1.0.0") ||
+  /release-candidate ready|does not claim the packages currently exist/i.test(
+    installationDocs,
+  )
+)
+  failures.push("Installation docs do not match the v1.0.0 published packages");
 for (const [name, version] of Object.entries(packageJson.dependencies ?? {})) {
   if (name.startsWith("@combric/") && version.includes("workspace:"))
     failures.push(`Workspace dependency: ${name}`);
@@ -225,6 +268,8 @@ if (failures.length) {
     root,
     "dist/docs/v1.0.0/components/actions/button/index.html",
   );
+  const cliDoc = join(root, "dist/docs/v1.0.0/getting-started/cli/index.html");
+  const guardDoc = join(root, "dist/docs/v1.0.0/reference/guard/index.html");
   const accidental = join(root, "dist/docs/v100/index.html");
   const latestDeep = join(
     root,
@@ -244,6 +289,8 @@ if (failures.length) {
     existsSync(join(root, "dist")) &&
     (!existsSync(canonicalRoot) ||
       !existsSync(canonicalDeep) ||
+      !existsSync(cliDoc) ||
+      !existsSync(guardDoc) ||
       !existsSync(latestDeep) ||
       !existsSync(legacyComponent) ||
       existsSync(accidental))

@@ -23,6 +23,16 @@ starlight-theme-select {
   background: var(--combric-color-surface);
 }
 
+.combric-tool-docs .expressive-code pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.combric-tool-docs .expressive-code .copy .feedback {
+  background-color: #14532d;
+  color: #fff;
+}
+
 .combric-docs-example,
 .combric-docs-token-table-wrap {
   overflow-x: auto;

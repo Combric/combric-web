@@ -1,15 +1,16 @@
 ---
 title: Installation
-description: Stable package installation paths and current release-candidate status.
+description: Install the published Combric 1.0.0 packages.
 ---
 
-> These are the stable 1.0 installation contracts. The repository is release
-> candidate ready, but does not claim the packages currently exist on npm.
+These instructions are for the `v1.0.0` framework documentation snapshot. The
+public Combric packages are published on npm at synchronized version `1.0.0`;
+pin Combric packages to that version when following this snapshot.
 
 ## React components
 
 ```sh
-npm install @combric/react react react-dom
+npm install @combric/react@1.0.0 react@^19 react-dom@^19
 ```
 
 React and React DOM `>=19.0.0 <20` are peer dependencies.
@@ -17,19 +18,19 @@ React and React DOM `>=19.0.0 <20` are peer dependencies.
 ## Tokens only
 
 ```sh
-npm install @combric/tokens
+npm install @combric/tokens@1.0.0
 ```
 
 ## Framework-independent layout
 
 ```sh
-npm install @combric/layout
+npm install @combric/layout@1.0.0
 ```
 
 ## Optional Tailwind adapter
 
 ```sh
-npm install @combric/tailwind tailwindcss
+npm install @combric/tailwind@1.0.0 tailwindcss
 ```
 
 Tailwind CSS must satisfy `>=4.3.0 <5`. Combric does not require the CLI,
