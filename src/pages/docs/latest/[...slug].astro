@@ -2,6 +2,7 @@
 import { currentDocumentationVersion, docsRoute } from "../../../data/versions";
 import { readdirSync } from "node:fs";
 import { join, relative } from "node:path";
+import { siteUrl } from "../../../lib/siteOrigin";
 
 export const prerender = true;
 export function getStaticPaths() {
@@ -33,7 +34,7 @@ const destination = docsRoute(currentDocumentationVersion, slug);
 ---
 
 <meta http-equiv="refresh" content={`0;url=${destination}`} />
-<link rel="canonical" href={destination} />
+<link rel="canonical" href={siteUrl(destination)} />
 <p>
   Redirecting to <a href={destination}>the current Combric documentation</a>.
 </p>

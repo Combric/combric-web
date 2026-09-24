@@ -7,6 +7,8 @@ import {
   docsRoute,
 } from "../../../data/versions";
 import "../../../styles/docs.css";
+import { siteUrl } from "../../../lib/siteOrigin";
+import { socialHead } from "../../../lib/seo";
 
 export const prerender = true;
 
@@ -61,7 +63,9 @@ export async function getStaticPaths() {
 
 const { entry, version } = Astro.props;
 const { Content } = await render(entry);
-const canonical = docsRoute(version, pagePath(entry.id));
+const canonicalPath = docsRoute(version, pagePath(entry.id));
+const canonical = siteUrl(canonicalPath);
+const description = entry.data.description ?? "Combric documentation.";
 const frontmatter = {
   ...entry.data,
   editUrl:
@@ -77,6 +81,13 @@ const frontmatter = {
     <meta name="viewport" content="width=device-width" />
     <link rel="canonical" href={canonical} />
     <title>{entry.data.title} — Combric {version.label}</title>
+    {socialHead(
+      `${entry.data.title} — Combric ${version.label}`,
+      description,
+      canonicalPath,
+    ).map((tag) => (
+      <meta {...tag} />
+    ))}
   </head>
   <body>
     <StarlightPage frontmatter={frontmatter}>
