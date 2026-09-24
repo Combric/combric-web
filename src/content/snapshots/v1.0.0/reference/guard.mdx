@@ -3,14 +3,17 @@ title: Combric Guard
 description: Read-only consumer-side package, CSS, and token integration checks.
 ---
 
+<div class="combric-tool-docs">
+
 Combric Guard is an **optional** static checker for an existing consumer
 project. It is published as `@combric/guard@1.0.0`. Combric components work
 without Guard.
 
-Install `@combric/guard` as a development dependency with your package manager
-and run:
+Install the version corresponding to this documentation snapshot as a
+development dependency and run:
 
 ```sh
+pnpm add --save-dev @combric/guard@1.0.0
 pnpm exec combric-guard check
 pnpm exec combric-guard check --json
 pnpm exec combric-guard check --project ./my-app
@@ -44,15 +47,19 @@ local CSS files. Zero-config projects are checked using declared Combric
 packages. A configured project additionally checks its selected mode and CSS
 entry.
 
-| Rule ID                                                                  | Contract                                                                                      |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| `GUARD_NO_COMBRIC`                                                       | Warning when no Combric package is declared.                                                  |
-| `GUARD_CONFIG_SCHEMA`, `GUARD_CONFIG_UNKNOWN`, `GUARD_MANAGER_CONFLICT`  | Static config shape, unknown fields, and manager consistency.                                 |
-| `GUARD_PACKAGE_MISSING`, `GUARD_REACT_VERSION`, `GUARD_TAILWIND_VERSION` | Required package declarations and supported React 19/Tailwind 4.3–4.x integration.            |
-| `GUARD_REACT_VERSION_UNKNOWN`, `GUARD_TAILWIND_VERSION_UNKNOWN`          | Warning when an opaque version declaration cannot be checked statically.                      |
-| `GUARD_CSS_IMPORT`, `GUARD_CSS_ENTRY`, `GUARD_TAILWIND_IMPORT`           | Public CSS entries, required imports, and Tailwind import order in one CSS entry.             |
-| `GUARD_TOKEN_UNKNOWN`                                                    | Unknown `var(--combric-...)` references, checked against names exported by `@combric/tokens`. |
-| `GUARD_SYMLINK_SKIPPED`                                                  | Warning that a consumer symlink was not followed.                                             |
+| Rule ID                                                             | Severity and contract                                                                        |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `GUARD_CONFIG_SCHEMA`                                               | Error for unsupported or malformed config schema.                                            |
+| `GUARD_CONFIG_UNKNOWN`                                              | Warning for unrecognized config fields.                                                      |
+| `GUARD_MANAGER_CONFLICT`                                            | Error when package-manager evidence conflicts with configuration.                            |
+| `GUARD_PACKAGE_MISSING`                                             | Error when a required package is not declared.                                               |
+| `GUARD_REACT_VERSION`, `GUARD_TAILWIND_VERSION`                     | Errors for unsupported React 19 or Tailwind `>=4.3 <5` integrations.                         |
+| `GUARD_REACT_VERSION_UNKNOWN`, `GUARD_TAILWIND_VERSION_UNKNOWN`     | Warnings when an opaque version declaration cannot be checked statically.                    |
+| `GUARD_CSS_ENTRY`, `GUARD_CSS_IMPORT`, `GUARD_TAILWIND_IMPORT`      | Errors for an invalid CSS entry, missing public imports, or incorrect Tailwind import order. |
+| `GUARD_TOKEN_UNKNOWN`                                               | Error for unknown `var(--combric-...)` references not exported by `@combric/tokens`.         |
+| `GUARD_NO_COMBRIC`                                                  | Warning when no Combric package is declared.                                                 |
+| `GUARD_SCAN_SKIPPED`, `GUARD_SYMLINK_SKIPPED`                       | Warnings when bounded traversal skips a deep directory or symlink.                           |
+| `GUARD_CONFIG`, `GUARD_PACKAGES`, `GUARD_CSS_READY`, `GUARD_TOKENS` | Pass diagnostics for successfully checked contracts.                                         |
 
 Pass diagnostics such as `GUARD_PACKAGES`, `GUARD_CONFIG`, `GUARD_CSS_READY`,
 and `GUARD_TOKENS` indicate checked contracts, not additional policy. Guard does
@@ -63,12 +70,17 @@ inspect generated/dependency directories, or enforce a generic design style.
 
 Guard is read-only and offline. It does not import/evaluate consumer JavaScript
 or TypeScript, execute scripts, install packages, follow symlinks, modify files,
-or offer `--fix`. Its CSS scan skips common generated directories and has
-file-size, entry-count, and depth bounds. An unsafe or oversized input fails
-operationally rather than being executed.
+or offer `--fix`. It skips common generated directories (`.git`, `node_modules`,
+`dist`, `build`, and related tool output). The scan is bounded: manifests are at
+most 1 MiB, config is at most 64 KiB, each CSS file is at most 1 MiB, traversal
+is limited to 2,000 directory entries and depth 8. Deeper directories and
+symlinks are skipped with warnings; unsafe core-file paths and exceeded hard
+limits fail operationally rather than being executed.
 
 Guard is **consumer-side** validation. Repository maintainers separately run
 `pnpm validate` and package-boundary/packed-artifact checks. Guard is also not
 an accessibility audit. The [accessibility guide](/docs/latest/accessibility/) explains the
 automated component regression matrix and the remaining application-level
 responsibilities.
+
+</div>

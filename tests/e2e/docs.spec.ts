@@ -180,6 +180,44 @@ test("unknown routes use the accessible 404 page", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("CLI and Guard documentation matches the published v1.0.0 contracts", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/docs/v1.0.0/getting-started/cli/");
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "CLI & Developer Experience",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("@combric/cli@1.0.0", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Tailwind CSS", { exact: false }).first(),
+  ).toBeVisible();
+  const cliCopy = page.getByTitle("Copy to clipboard").first();
+  await expect(cliCopy).toBeVisible();
+  await cliCopy.click();
+  await expect(cliCopy).toHaveAttribute("data-copied", "Copied!");
+  await expect
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .toContain("@combric/cli@1.0.0");
+  await expectNoAxeViolations(page);
+
+  await page.goto("/docs/v1.0.0/reference/guard/");
+  await expect(
+    page.getByText("@combric/guard@1.0.0", { exact: true }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText("GUARD_SCAN_SKIPPED", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Exit 2", { exact: false })).toBeVisible();
+  await expectNoAxeViolations(page);
+});
+
 test.describe("mobile documentation", () => {
   test.skip(({ isMobile }) => !isMobile, "mobile project only");
 
