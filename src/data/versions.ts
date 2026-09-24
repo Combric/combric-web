@@ -4,6 +4,10 @@ export type DocumentationVersion = {
   status: "current" | "previous";
   packageVersion: string;
   contentRoot: string;
+  packages: readonly Readonly<{
+    name: `@combric/${string}`;
+    integration: "native" | "adapter" | "tooling";
+  }>[];
 };
 
 export const documentationVersions = Object.freeze([
@@ -13,6 +17,14 @@ export const documentationVersions = Object.freeze([
     status: "current",
     packageVersion: "1.0.0",
     contentRoot: "docs/v1.0.0",
+    packages: Object.freeze([
+      { name: "@combric/tokens", integration: "native" },
+      { name: "@combric/layout", integration: "native" },
+      { name: "@combric/react", integration: "native" },
+      { name: "@combric/tailwind", integration: "adapter" },
+      { name: "@combric/cli", integration: "tooling" },
+      { name: "@combric/guard", integration: "tooling" },
+    ]),
   },
 ] satisfies readonly DocumentationVersion[]);
 

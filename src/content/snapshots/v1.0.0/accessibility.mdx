@@ -41,7 +41,12 @@ Drawer/Sheet, DropdownMenu, Popover, Tooltip, Toast, Toggle, and ToggleGroup. It
 combines axe scans with component-specific keyboard, focus, state, naming, and
 dismissal assertions where applicable. Modal focus trapping and restoration also
 have focused component tests. This is regression coverage, not a complete audit
-of a consumer application or a WCAG conformance claim.
+of a consumer application or a WCAG conformance claim. The release gate also
+checks the landing page, versioned documentation, catalogue, accessibility
+guide, search, and current Playground in desktop and mobile Chromium under light,
+dark, and system color preferences. Mobile checks include navigation, search,
+overlay dismissal, responsive overflow, and the Playground; they do not certify
+the accessibility of a consuming application.
 
 [Combric Guard](/docs/latest/reference/guard/) checks static package, CSS, and token
 integration. It does not evaluate runtime accessibility behavior.

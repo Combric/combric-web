@@ -76,23 +76,41 @@ function collectCatalogueEntries(node) {
   ts.forEachChild(node, collectCatalogueEntries);
 }
 collectCatalogueEntries(catalogueAst);
-if (currentDocumentationVersion.id !== "v1.0.0")
-  failures.push("Current documentation version must be v1.0.0");
-if (
-  new Set(documentationVersions.map((version) => version.id)).size !==
-  documentationVersions.length
-)
+const versionIds = documentationVersions.map((version) => version.id);
+const currentVersions = documentationVersions.filter(
+  (version) => version.status === "current",
+);
+if (new Set(versionIds).size !== versionIds.length)
   failures.push("Duplicate version IDs");
-if (
-  !documentationVersions.some(
-    (version) => version.id === currentDocumentationVersion.id,
-  )
-)
+if (currentVersions.length !== 1)
+  failures.push("Exactly one current documentation version is required");
+if (!documentationVersions.includes(currentDocumentationVersion))
   failures.push("Current version is not available");
-if (currentDocumentationVersion.packageVersion !== "1.0.0")
-  failures.push("Current docs/package version invariant failed");
-if (documentationVersions.some((version) => version.id === "v100"))
-  failures.push("Invalid normalized version ID v100");
+for (const version of documentationVersions) {
+  if (!/^v\d+\.\d+\.\d+$/.test(version.id))
+    failures.push(`Invalid documentation version ID: ${version.id}`);
+  if (version.id !== `v${version.packageVersion}`)
+    failures.push(`Docs/package version mismatch for ${version.id}`);
+  if (!version.packages?.length)
+    failures.push(`No public packages registered for ${version.id}`);
+  if (
+    new Set(version.packages?.map((item) => item.name)).size !==
+    version.packages?.length
+  )
+    failures.push(`Duplicate public package names for ${version.id}`);
+  if (!existsSync(join(root, "src/content/snapshots", version.id)))
+    failures.push(`Missing documentation snapshot for ${version.id}`);
+}
+const snapshotIds = readdirSync(join(root, "src/content/snapshots"), {
+  withFileTypes: true,
+})
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .sort();
+if ([...versionIds].sort().join("\n") !== snapshotIds.join("\n"))
+  failures.push("Available documentation versions and snapshots must match");
+if (currentDocumentationVersion.id !== "v1.0.0")
+  failures.push("Current stable documentation must remain v1.0.0");
 if (existsSync(join(root, "src/content/docs/docs/v1.0.0")))
   failures.push("Duplicate v1.0.0 content tree");
 const required = [
@@ -119,6 +137,21 @@ for (const path of required)
 const packageJson = JSON.parse(
   readFileSync(join(root, "package.json"), "utf8"),
 );
+const packageLock = readFileSync(join(root, "pnpm-lock.yaml"), "utf8");
+const releaseDocs = readFileSync(
+  join(root, "src/content/snapshots/v1.0.0/reference/releasing.mdx"),
+  "utf8",
+);
+const packageDocs = readFileSync(
+  join(root, "src/content/snapshots/v1.0.0/reference/packages.mdx"),
+  "utf8",
+);
+const supportDocs = readFileSync(
+  join(root, "src/content/snapshots/v1.0.0/reference/support.mdx"),
+  "utf8",
+);
+const readme = readFileSync(join(root, "README.md"), "utf8");
+const astroConfig = readFileSync(join(root, "astro.config.mjs"), "utf8");
 const cliDocs = readFileSync(
   join(root, "src/content/snapshots/v1.0.0/getting-started/cli.mdx"),
   "utf8",
@@ -131,18 +164,95 @@ const installationDocs = readFileSync(
   join(root, "src/content/snapshots/v1.0.0/getting-started/installation.mdx"),
   "utf8",
 );
-for (const [name, version] of Object.entries(packageJson.dependencies ?? {})) {
-  if (name.startsWith("@combric/") && version !== "1.0.0")
-    failures.push(`Installed public package version drift: ${name}@${version}`);
+const registeredPackageNames = currentDocumentationVersion.packages.map(
+  (item) => item.name,
+);
+for (const [name, installedVersion] of Object.entries(
+  packageJson.dependencies ?? {},
+)) {
+  if (
+    name.startsWith("@combric/") &&
+    installedVersion !== currentDocumentationVersion.packageVersion
+  )
+    failures.push(
+      `Installed public package version drift: ${name}@${installedVersion}`,
+    );
+  if (name === "@combric/core")
+    failures.push("Private @combric/core must not be consumed");
 }
+for (const name of registeredPackageNames)
+  if (!packageDocs.includes(`\`${name}\``))
+    failures.push(`Package reference docs omit ${name}`);
 if (
-  !cliDocs.includes("@combric/cli@1.0.0") ||
+  currentDocumentationVersion.packages.length !== 6 ||
+  registeredPackageNames.some(
+    (name) =>
+      !/^(?:@combric\/(?:tokens|layout|react|tailwind|cli|guard))$/.test(name),
+  )
+)
+  failures.push(
+    "The v1.0.0 registry must contain only the six public packages",
+  );
+if (
+  /^\s+(?:specifier|version):\s+(?:workspace:|link:|portal:|file:|git\+)/m.test(
+    packageLock,
+  )
+)
+  failures.push(
+    "Package lock must resolve public dependencies, not local sources",
+  );
+if (packageLock.includes("@combric/core@"))
+  failures.push("Private @combric/core must not appear in the dependency lock");
+if (/workspace:|link:|portal:|file:|git\+/.test(JSON.stringify(packageJson)))
+  failures.push(
+    "Web dependencies must not use workspace or local package sources",
+  );
+if (
+  !astroConfig.includes("process.env.COMBRIC_DOCS_SITE_URL") ||
+  !/site:\s*configuredSite/.test(astroConfig)
+)
+  failures.push(
+    "The site origin must remain optional and environment-provided",
+  );
+if (
+  !readme.includes(
+    "MANUAL GATE — production hosting/domain not yet selected/configured",
+  )
+)
+  failures.push(
+    "The production hosting/domain manual gate must remain visible",
+  );
+if (
+  !releaseDocs.includes("published") ||
+  !releaseDocs.includes("bootstrap") ||
+  !releaseDocs.includes("COMBRIC_DOCS_SITE_URL") ||
+  /packages are new to npm|still absent from npm|PUBLISH NOT APPROVED/i.test(
+    releaseDocs,
+  )
+)
+  failures.push(
+    "Release documentation is stale or omits release authority boundaries",
+  );
+if (
+  !/Semantic\s+Versioning/.test(supportDocs) ||
+  !supportDocs.includes("published on npm") ||
+  !supportDocs.includes("No migration guides are claimed")
+)
+  failures.push(
+    "Support documentation must describe current published version semantics",
+  );
+if (
+  !cliDocs.includes(
+    `@combric/cli@${currentDocumentationVersion.packageVersion}`,
+  ) ||
   !cliDocs.includes("published") ||
   /not yet published|local tarball or\s+workspace until release/i.test(cliDocs)
 )
   failures.push("CLI docs do not describe the published 1.0.0 package truth");
 if (
-  !guardDocs.includes("@combric/guard@1.0.0") ||
+  !guardDocs.includes(
+    `@combric/guard@${currentDocumentationVersion.packageVersion}`,
+  ) ||
   !guardDocs.includes("GUARD_SCAN_SKIPPED") ||
   !guardDocs.includes("GUARD_TOKEN_UNKNOWN")
 )
@@ -150,10 +260,18 @@ if (
     "Guard docs are missing the published version or rule contract",
   );
 if (
-  !installationDocs.includes("@combric/react@1.0.0") ||
-  !installationDocs.includes("@combric/tokens@1.0.0") ||
-  !installationDocs.includes("@combric/layout@1.0.0") ||
-  !installationDocs.includes("@combric/tailwind@1.0.0") ||
+  !installationDocs.includes(
+    `@combric/react@${currentDocumentationVersion.packageVersion}`,
+  ) ||
+  !installationDocs.includes(
+    `@combric/tokens@${currentDocumentationVersion.packageVersion}`,
+  ) ||
+  !installationDocs.includes(
+    `@combric/layout@${currentDocumentationVersion.packageVersion}`,
+  ) ||
+  !installationDocs.includes(
+    `@combric/tailwind@${currentDocumentationVersion.packageVersion}`,
+  ) ||
   /release-candidate ready|does not claim the packages currently exist/i.test(
     installationDocs,
   )
@@ -408,7 +526,27 @@ if (failures.length) {
     root,
     "dist/components/actions/button/index.html",
   );
+  const unknownVersion = join(root, "dist/docs/v9.9.9/index.html");
   const pagefindEntry = join(root, "dist/pagefind/pagefind-entry.json");
+  const pagefindIndexes = join(root, "dist/pagefind/index");
+  const latestHtml = existsSync(latestDeep)
+    ? readFileSync(latestDeep, "utf8")
+    : "";
+  const legacyHtml = existsSync(legacyComponent)
+    ? readFileSync(legacyComponent, "utf8")
+    : "";
+  let pagefindData;
+  if (existsSync(pagefindEntry)) {
+    try {
+      pagefindData = JSON.parse(readFileSync(pagefindEntry, "utf8"));
+    } catch {
+      console.error("FAIL: built Pagefind entry must be valid JSON");
+      process.exitCode = 1;
+    }
+  }
+  const indexFiles = existsSync(pagefindIndexes)
+    ? readdirSync(pagefindIndexes).filter((file) => file.endsWith(".pf_index"))
+    : [];
   const builtCss = existsSync(join(root, "dist"))
     ? readdirSync(join(root, "dist/_astro"))
         .filter((file) => file.endsWith(".css"))
@@ -424,11 +562,29 @@ if (failures.length) {
       !existsSync(latestDeep) ||
       !existsSync(legacyComponent) ||
       !existsSync(pagefindEntry) ||
-      existsSync(accidental))
+      existsSync(accidental) ||
+      existsSync(unknownVersion))
   ) {
     console.error("FAIL: built version route invariant failed");
     process.exitCode = 1;
   } else {
+    if (
+      !latestHtml.includes("/docs/v1.0.0/components/actions/button") ||
+      !legacyHtml.includes("/docs/latest/components/actions/button")
+    ) {
+      console.error(
+        "FAIL: latest and legacy redirects must follow the canonical version route chain",
+      );
+      process.exitCode = 1;
+    }
+    if (
+      !pagefindData?.languages?.en?.page_count ||
+      pagefindData.languages.en.page_count < 1 ||
+      indexFiles.length === 0
+    ) {
+      console.error("FAIL: static Pagefind index output is missing or empty");
+      process.exitCode = 1;
+    }
     if (
       builtCss &&
       (!builtCss.includes(".grid-combric-auto-sm") ||
@@ -439,8 +595,9 @@ if (failures.length) {
       );
       process.exitCode = 1;
     }
-    console.log(
-      `PASS: standalone documentation contract; canonical=${docsRoute(currentDocumentationVersion)} latest=${latestRoute()}`,
-    );
+    if (process.exitCode !== 1)
+      console.log(
+        `PASS: standalone documentation contract; canonical=${docsRoute(currentDocumentationVersion)} latest=${latestRoute()}`,
+      );
   }
 }
