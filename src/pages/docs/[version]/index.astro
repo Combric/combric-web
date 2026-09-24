@@ -7,6 +7,8 @@ import {
   docsRoute,
 } from "../../../data/versions";
 import "../../../styles/docs.css";
+import { siteUrl } from "../../../lib/siteOrigin";
+import { socialHead } from "../../../lib/seo";
 
 export const prerender = true;
 
@@ -39,8 +41,15 @@ const frontmatter = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="canonical" href={docsRoute(version)} />
+    <link rel="canonical" href={siteUrl(docsRoute(version))} />
     <title>{entry.data.title} — Combric {version.label}</title>
+    {socialHead(
+      `${entry.data.title} — Combric ${version.label}`,
+      entry.data.description ?? "Combric documentation.",
+      docsRoute(version),
+    ).map((tag) => (
+      <meta {...tag} />
+    ))}
   </head>
   <body>
     <StarlightPage frontmatter={frontmatter}>

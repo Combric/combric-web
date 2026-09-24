@@ -9,8 +9,9 @@ import {
   latestRoute,
   legacyDocumentationPaths,
 } from "./src/data/versions.ts";
+import { configuredSiteOrigin } from "./src/lib/siteOrigin.ts";
 
-const configuredSite = process.env.COMBRIC_DOCS_SITE_URL;
+const configuredSite = configuredSiteOrigin(process.env.COMBRIC_DOCS_SITE_URL);
 const docs = (path) => docsRoute(currentDocumentationVersion, path);
 const legacyRedirects = Object.fromEntries([
   ...legacyDocumentationPaths.map((path) => [`/${path}/`, latestRoute(path)]),

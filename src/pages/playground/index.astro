@@ -1,6 +1,8 @@
 ---
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { Playground } from "../../playground/Playground";
+import { siteUrl } from "../../lib/siteOrigin";
+import { socialHead } from "../../lib/seo";
 ---
 
 <StarlightPage
@@ -10,6 +12,16 @@ import { Playground } from "../../playground/Playground";
     tableOfContents: false,
   }}
 >
+  <Fragment slot="head">
+    <link rel="canonical" href={siteUrl("/playground/")} />
+    {socialHead(
+      "Playground — Combric",
+      "Controlled real-component preview and code generator.",
+      "/playground/",
+    ).map((tag) => (
+      <meta {...tag} />
+    ))}
+  </Fragment>
   <p>
     Explore approved props and states from the real public component package.
     This Playground never evaluates user code, installs dependencies, edits
