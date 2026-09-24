@@ -51,6 +51,7 @@ const required = [
   "src/content/snapshots/v1.0.0/reference/packages.mdx",
   "src/content/snapshots/v1.0.0/reference/guard.mdx",
   "src/styles/tailwind-demos.css",
+  "src/assets/brand/combric-logo.png",
 ];
 
 for (const path of required)
@@ -279,6 +280,7 @@ if (failures.length) {
     root,
     "dist/components/actions/button/index.html",
   );
+  const pagefindEntry = join(root, "dist/pagefind/pagefind-entry.json");
   const builtCss = existsSync(join(root, "dist"))
     ? readdirSync(join(root, "dist/_astro"))
         .filter((file) => file.endsWith(".css"))
@@ -293,6 +295,7 @@ if (failures.length) {
       !existsSync(guardDoc) ||
       !existsSync(latestDeep) ||
       !existsSync(legacyComponent) ||
+      !existsSync(pagefindEntry) ||
       existsSync(accidental))
   ) {
     console.error("FAIL: built version route invariant failed");
