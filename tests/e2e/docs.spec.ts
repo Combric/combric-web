@@ -70,6 +70,51 @@ test("Color Map exposes canonical and derived data", async ({ page }) => {
   await expectNoAxeViolations(page);
 });
 
+test("Native CSS and Tailwind previews share canonical tokens and responsive content", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/docs/v1.0.0/getting-started/standard-css/");
+  const surface = page.locator('[data-comparison-id="foundation-surface"]');
+  await expect(
+    surface
+      .locator(".combric-docs-example")
+      .getByText("Canonical token surface"),
+  ).toHaveCount(2);
+  await expect(surface.locator('[data-demo-id*="tailwind"]')).toContainClass(
+    "combric-docs-demo",
+  );
+  const nativeRadius = await surface
+    .locator('[data-demo-id*="native-css"] article')
+    .evaluate((node) => getComputedStyle(node).borderRadius);
+  const tailwindRadius = await surface
+    .locator('[data-demo-id*="tailwind"] article')
+    .evaluate((node) => getComputedStyle(node).borderRadius);
+  expect(nativeRadius).toBe(tailwindRadius);
+  await expectNoAxeViolations(page);
+
+  await page.goto("/docs/v1.0.0/layout/grid/");
+  const comparison = page.locator('[data-comparison-id="responsive-grid"]');
+  for (const approach of ["native-css", "tailwind"]) {
+    const demo = comparison.locator(`[data-demo-id*="${approach}"]`);
+    const grid = demo.locator(
+      ".combric-docs-example .combric-grid, .combric-docs-example .grid-combric-auto-sm",
+    );
+    await expect(demo.locator(".combric-docs-example article")).toHaveCount(3);
+    const desktopColumns = await grid.evaluate(
+      (node) => getComputedStyle(node).gridTemplateColumns.split(" ").length,
+    );
+    expect(desktopColumns).toBeGreaterThan(1);
+    await page.setViewportSize({ width: 390, height: 844 });
+    const mobileColumns = await grid.evaluate(
+      (node) => getComputedStyle(node).gridTemplateColumns.split(" ").length,
+    );
+    expect(mobileColumns).toBe(1);
+    await page.setViewportSize({ width: 1280, height: 900 });
+  }
+  await expectNoAxeViolations(page);
+});
+
 test("Playground controls update code and viewport", async ({ page }) => {
   await page.goto("/playground/");
   await expect(

@@ -1,11 +1,25 @@
-export interface CatalogueDemoMetadata {
+interface BaseDemoMetadata {
   readonly id: string;
   readonly version: "v1.0.0";
-  readonly catalogueSlug: string;
   readonly exampleKey: string;
   readonly title: string;
   readonly testScenario?: string;
 }
+
+export type CatalogueDemoMetadata =
+  | (BaseDemoMetadata & {
+      readonly kind?: "component";
+      readonly catalogueSlug: string;
+    })
+  | (BaseDemoMetadata & {
+      readonly kind: "layout";
+      readonly layoutSlug: string;
+    })
+  | (BaseDemoMetadata & {
+      readonly kind: "styling";
+      readonly comparisonId: string;
+      readonly approach: "native-css" | "tailwind";
+    });
 
 export const catalogueTestScenarioIds = Object.freeze([
   "accordion",
@@ -301,5 +315,81 @@ export const catalogueDemoMetadata = Object.freeze([
     catalogueSlug: "empty-state",
     exampleKey: "empty-state",
     title: "Empty state",
+  },
+  {
+    id: "v1.0.0/layout/container",
+    version: "v1.0.0",
+    kind: "layout",
+    layoutSlug: "container",
+    exampleKey: "layout-container",
+    title: "Container",
+  },
+  {
+    id: "v1.0.0/layout/stack",
+    version: "v1.0.0",
+    kind: "layout",
+    layoutSlug: "stack",
+    exampleKey: "layout-stack",
+    title: "Stack",
+  },
+  {
+    id: "v1.0.0/layout/inline",
+    version: "v1.0.0",
+    kind: "layout",
+    layoutSlug: "inline",
+    exampleKey: "layout-inline",
+    title: "Inline",
+  },
+  {
+    id: "v1.0.0/layout/cluster",
+    version: "v1.0.0",
+    kind: "layout",
+    layoutSlug: "cluster",
+    exampleKey: "layout-cluster",
+    title: "Cluster",
+  },
+  {
+    id: "v1.0.0/layout/grid",
+    version: "v1.0.0",
+    kind: "layout",
+    layoutSlug: "grid",
+    exampleKey: "layout-grid",
+    title: "Grid",
+  },
+  {
+    id: "v1.0.0/styling/foundation-native-css",
+    version: "v1.0.0",
+    kind: "styling",
+    comparisonId: "foundation-surface",
+    approach: "native-css",
+    exampleKey: "foundation-native-css",
+    title: "Foundation surface — Native CSS",
+  },
+  {
+    id: "v1.0.0/styling/foundation-tailwind",
+    version: "v1.0.0",
+    kind: "styling",
+    comparisonId: "foundation-surface",
+    approach: "tailwind",
+    exampleKey: "foundation-tailwind",
+    title: "Foundation surface — Tailwind adapter",
+  },
+  {
+    id: "v1.0.0/styling/grid-native-css",
+    version: "v1.0.0",
+    kind: "styling",
+    comparisonId: "responsive-grid",
+    approach: "native-css",
+    exampleKey: "grid-native-css",
+    title: "Responsive grid — Native CSS",
+  },
+  {
+    id: "v1.0.0/styling/grid-tailwind",
+    version: "v1.0.0",
+    kind: "styling",
+    comparisonId: "responsive-grid",
+    approach: "tailwind",
+    exampleKey: "grid-tailwind",
+    title: "Responsive grid — Tailwind adapter",
   },
 ] satisfies readonly CatalogueDemoMetadata[]);

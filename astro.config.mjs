@@ -1,5 +1,6 @@
 import react from "@astrojs/react";
 import starlight from "@astrojs/starlight";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import { catalogue } from "./src/data/catalogue.ts";
 import {
@@ -31,7 +32,7 @@ export default defineConfig({
     starlight({
       title: "Combric",
       description: "Package-first UI framework documentation",
-      customCss: ["./src/styles/docs.css"],
+      customCss: ["./src/styles/docs.css", "./src/styles/tailwind-demos.css"],
       pagefind: false,
       social: [
         {
@@ -111,6 +112,9 @@ export default defineConfig({
     react(),
   ],
   output: "static",
+  vite: {
+    plugins: [tailwindcss()],
+  },
   redirects: {
     ...legacyRedirects,
   },

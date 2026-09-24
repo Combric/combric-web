@@ -1,8 +1,8 @@
 ---
 import { layouts, layoutRoute, sourceUrl } from "../data/catalogue";
 import { currentDocumentationVersion } from "../data/versions";
-import { layoutExamples } from "../examples/layout-examples";
-import { LayoutExampleRenderer } from "../examples/LayoutExampleRenderer";
+import { layoutDemosFor } from "../examples/catalogue-examples";
+import { ExampleRenderer } from "../examples/ExampleRenderer";
 import { CopyButton } from "./CopyButton";
 
 interface Props {
@@ -11,8 +11,8 @@ interface Props {
 const { slug } = Astro.props;
 const item = layouts.find((candidate) => candidate.slug === slug);
 if (!item) throw new Error(`Unknown layout slug: ${slug}`);
-const example = layoutExamples[slug];
-if (!example) throw new Error(`Missing layout example: ${slug}`);
+const demos = layoutDemosFor(currentDocumentationVersion.id, slug);
+if (!demos.length) throw new Error(`Missing layout example: ${slug}`);
 ---
 
 <p class="combric-docs-version">
@@ -30,11 +30,22 @@ if (!example) throw new Error(`Missing layout example: ${slug}`);
 </p>
 
 <h2>Example</h2>
-<div class="combric-docs-example">
-  <LayoutExampleRenderer slug={slug} client:visible />
-</div>
-<CopyButton text={example.source} client:load />
-<pre class="combric-docs-source"><code>{example.source}</code></pre>
+{demos.map((demo) => (
+  <section class="combric-docs-demo" data-demo-id={demo.id}>
+    <h3>{demo.title}</h3>
+    <div class="combric-docs-example">
+      <ExampleRenderer demoId={demo.id} client:load />
+    </div>
+    <details class="combric-docs-code">
+      <summary>View Code</summary>
+      <pre
+        class="combric-docs-source"
+        tabindex="0"
+      ><code>{demo.source}</code></pre>
+    </details>
+    <CopyButton text={demo.source} label="Copy Code" client:load />
+  </section>
+))}
 
 <h2>API</h2>
 <ul>

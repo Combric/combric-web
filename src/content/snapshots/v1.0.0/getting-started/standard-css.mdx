@@ -3,6 +3,8 @@ title: Standard CSS
 description: Use Combric tokens and layout without Tailwind.
 ---
 
+import StylingComparison from "../../../../components/StylingComparison.astro";
+
 Standard CSS is a first-class Combric path.
 
 ```css
@@ -18,3 +20,10 @@ Standard CSS is a first-class Combric path.
 
 For layout classes, import `@combric/layout/css`. For React components, a single
 `@combric/react/css` import includes layout and tokens.
+
+## Foundation surface
+
+The preview and copyable source below use only canonical token variables. The
+default `--combric-radius` remains zero in Metriq.
+
+<StylingComparison comparisonId="foundation-surface" />

@@ -1,0 +1,35 @@
+---
+import { ExampleRenderer } from "../examples/ExampleRenderer";
+import { stylingDemosFor } from "../examples/catalogue-examples";
+import { CopyButton } from "./CopyButton";
+
+interface Props {
+  comparisonId: string;
+}
+
+const { comparisonId } = Astro.props;
+const demos = stylingDemosFor(comparisonId);
+const nativeDemo = demos.find((demo) => demo.approach === "native-css");
+const tailwindDemo = demos.find((demo) => demo.approach === "tailwind");
+if (!nativeDemo || !tailwindDemo)
+  throw new Error(`Incomplete styling comparison: ${comparisonId}`);
+---
+
+<div class="combric-style-comparison" data-comparison-id={comparisonId}>
+  {[nativeDemo, tailwindDemo].map((demo) => (
+    <section class="combric-docs-demo" data-demo-id={demo.id}>
+      <h3>{demo.title}</h3>
+      <div class="combric-docs-example">
+        <ExampleRenderer demoId={demo.id} client:load />
+      </div>
+      <details class="combric-docs-code">
+        <summary>View Code</summary>
+        <pre
+          class="combric-docs-source"
+          tabindex="0"
+        ><code>{demo.source}</code></pre>
+      </details>
+      <CopyButton text={demo.source} label="Copy Code" client:load />
+    </section>
+  ))}
+</div>

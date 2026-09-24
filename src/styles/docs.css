@@ -2,7 +2,7 @@
 
 :root {
   --sl-color-accent-low: #deded8;
-  --sl-color-accent: #1d4ed8;
+  --sl-color-accent: var(--combric-color-accent);
   --sl-color-accent-high: #181816;
   --sl-font: var(--combric-font-family-body);
   --sl-font-mono: var(--combric-font-family-code);
@@ -27,6 +27,20 @@ starlight-theme-select {
 .combric-docs-token-table-wrap {
   overflow-x: auto;
   max-width: 100%;
+}
+
+.combric-style-comparison {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--combric-space-5);
+}
+
+.combric-style-comparison .surface {
+  border: var(--combric-border-width) solid var(--combric-color-border);
+  background: var(--combric-color-surface);
+  color: var(--combric-color-text);
+  padding: var(--combric-space-4);
+  border-radius: var(--combric-radius);
 }
 
 .combric-docs-example {
