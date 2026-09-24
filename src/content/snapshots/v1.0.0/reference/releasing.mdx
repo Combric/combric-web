@@ -1,52 +1,54 @@
 ---
 title: Release Safety
-description: Manual prerequisites and publication gates for Combric 1.0.
+description: Evidence and authority boundaries for framework and website releases.
 ---
 
-Repository validation can make Combric release-candidate ready; it cannot prove
-or grant external npm authority. Publication requires a separate explicit
-Product Owner approval after the release-preparation pull request is merged.
+## Current package state
 
-The six packages are new to npm. Because npm requires a package to exist before
-its Trusted Publisher can be configured, the one-time initial publication path
-is documented in `release/FIRST-PUBLISH-BOOTSTRAP.md`. It is the only supported
-manual bootstrap and remains **PUBLISH NOT APPROVED** until explicitly
-authorized.
+The six public Combric packages are available on the npm registry at the
+synchronized `1.0.0` version documented by this snapshot: `@combric/tokens`,
+`@combric/layout`, `@combric/react`, `@combric/tailwind`, `@combric/cli`, and
+`@combric/guard`. All six are currently published on npm. The COMBRIC-WEB
+release-quality check installs these packages from `https://registry.npmjs.org/`
+in a temporary consumer project and verifies their public entry points. Registry access is required; the check does not
+substitute workspace packages, source paths, or local tarballs.
 
-## Manual prerequisites
+The first-publication bootstrap instructions describe a one-time registry
+constraint, not current publication status or authorization. These package
+names already have public `1.0.0` releases. Do not repeat bootstrap or attempt
+to republish `1.0.0`. The consumer check is evidence of availability and
+compatibility only; it cannot grant publication authority.
 
-Before dispatching `.github/workflows/release.yml`, verify all of the following:
+## Separate release decisions
 
-After the one-time bootstrap, complete Trusted Publisher setup for all six
-packages before using this workflow.
+- A framework release changes the synchronized package version and follows the
+  framework repository's approved release process. Semantic Versioning applies
+  to the documented package APIs, types, CSS entry points, CLI, and Guard
+  contracts. Breaking changes require a major version; compatible features use
+  a minor version; compatible fixes use a patch version.
+- A COMBRIC-WEB release updates the site, documentation snapshot, consumer
+  checks, and static output. It does not publish framework packages.
+- Publishing packages requires separate explicit Product Owner authorization
+  and the framework repository's protected release workflow. A green website
+  check or merged documentation change is not publication approval.
+- Hosting and domain selection are separate again. This repository has no
+  configured production host or domain, and this milestone does not deploy.
 
-- the publisher controls the npm `@combric` scope and all six package names;
-- the npm organization/account grants the required publication permissions;
-- each package has an npm Trusted Publisher for GitHub organization `Combric`,
-  repository `combric`, and workflow filename `release.yml`;
-- the optional Trusted Publisher environment is exactly `npm-release`, matching
-  the protected GitHub environment used by the publish job;
-- direct `npm publish` is allowed for those Trusted Publisher connections;
-- the repository is public so npm provenance can be generated for public
-  packages;
-- the approved release commit is the exact current `main` commit;
-- `@combric/*@1.0.0` is still absent from npm and `v1.0.0` is still absent from
-  Git and GitHub Releases.
+The static build and release-quality check run without
+`COMBRIC_DOCS_SITE_URL`. Set that variable only after the production origin has
+been deliberately selected and approved.
 
-Do not configure or store a long-lived npm write token. The workflow uses
-GitHub-hosted runners, OIDC (`id-token: write` only in the publish job), public
-access, and npm provenance.
+MANUAL GATE — production hosting/domain not yet selected/configured
 
-## Workflow behavior
+## Release-quality check
 
-The manual workflow requires the exact 40-character release commit and the
-literal confirmation `PUBLISH APPROVED`. Its preparation job runs the complete
-quality, documentation, browser/accessibility, artifact, packed-consumer, and
-npm-availability checks before producing hashed tarballs. Publication consumes
-those exact tarballs in dependency order and stops on the first failure without
-attempting rollback or unpublish. The repository tag and GitHub Release are
-created only after every npm package can be verified at `1.0.0`.
+From a clean checkout, install the web application's locked dependencies with
+`pnpm install --frozen-lockfile`, then run `pnpm release:check`. The gate covers
+formatting, lint, types, docs and package-boundary invariants, public-registry
+consumer smoke tests, a static build, versioned/latest/legacy routes, Pagefind
+output, and Playwright/axe accessibility regressions on desktop and mobile
+Chromium. It is a bounded regression suite, not a WCAG certification or a
+claim that every consumer application is accessible.
 
-Because npm multi-package publication is not transactional, workflow logs are
-the authoritative record of any packages published before an unexpected
-mid-sequence failure.
+The checked-in CI runs the same release-quality command. A successful run does
+not publish packages, configure hosting, or deploy the website.

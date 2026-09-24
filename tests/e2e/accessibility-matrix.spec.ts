@@ -172,7 +172,7 @@ async function exercise(page: Page, scenario: string): Promise<void> {
       const control = page.getByRole("button", { name: "Pin project" });
       await expect(control).toHaveAttribute("aria-pressed", "true");
       await control.focus();
-      await page.keyboard.press("Space");
+      await control.press("Space");
       await expect(control).toHaveAttribute("aria-pressed", "false");
       break;
     }

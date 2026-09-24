@@ -6,6 +6,11 @@ description: Stable public compatibility and Semantic Versioning policy.
 Combric's six public packages use one synchronized version and follow Semantic
 Versioning. The current stable public release is `1.0.0`.
 
+All six `1.0.0` packages are published on npm. The repository's release-quality
+check verifies their availability by installing them from the public registry
+in an isolated consumer fixture. This check confirms package consumption; it is
+not publication authority and does not publish or modify framework packages.
+
 ## Public compatibility contract
 
 The stable contract includes exported JavaScript and TypeScript APIs, exported

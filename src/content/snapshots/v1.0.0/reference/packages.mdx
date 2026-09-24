@@ -14,3 +14,6 @@ description: Current Combric package boundaries and release status.
 | `@combric/core`     | Empty private repository boundary   | Excluded from public release |
 
 The six public packages use synchronized version `1.0.0` and are published on npm.
+The release-quality check installs these exact versions from the public npm
+registry in an isolated consumer fixture; it does not use framework source,
+workspace links, or local tarballs.
