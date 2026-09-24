@@ -2,9 +2,10 @@ import { useState } from "react";
 
 export interface CopyButtonProps {
   readonly text: string;
+  readonly label?: string;
 }
 
-export function CopyButton({ text }: CopyButtonProps) {
+export function CopyButton({ text, label = "Copy code" }: CopyButtonProps) {
   const [status, setStatus] = useState<"idle" | "copied" | "error">("idle");
 
   async function copy() {
@@ -36,9 +37,9 @@ export function CopyButton({ text }: CopyButtonProps) {
         className="combric-button"
         data-size="sm"
         onClick={copy}
-        aria-label="Copy example code"
+        aria-label={label}
       >
-        Copy code
+        {label}
       </button>{" "}
       <span role="status" aria-live="polite">
         {status === "copied"

@@ -1,7 +1,7 @@
 ---
 import { catalogue, catalogueRoute, sourceUrl } from "../data/catalogue";
 import { currentDocumentationVersion } from "../data/versions";
-import { examples } from "../examples/catalogue-examples";
+import { catalogueDemosFor } from "../examples/catalogue-examples";
 import { ExampleRenderer } from "../examples/ExampleRenderer";
 import { CopyButton } from "./CopyButton";
 
@@ -11,8 +11,13 @@ interface Props {
 const { slug } = Astro.props;
 const item = catalogue.find((candidate) => candidate.slug === slug);
 if (!item) throw new Error(`Unknown catalogue slug: ${slug}`);
-const example = examples[slug];
-if (!example) throw new Error(`Missing example for catalogue slug: ${slug}`);
+const version = Astro.url.pathname.match(/^\/docs\/(v\d+\.\d+\.\d+)\//)?.[1];
+if (!version)
+  throw new Error(
+    `Catalogue page is not under a versioned route: ${Astro.url.pathname}`,
+  );
+const demos = catalogueDemosFor(version, slug);
+if (!demos.length) throw new Error(`Missing examples for ${version}/${slug}`);
 ---
 
 <p class="combric-docs-version">
@@ -36,21 +41,24 @@ if (!example) throw new Error(`Missing example for catalogue slug: ${slug}`);
   The standard CSS path does not require Tailwind.
 </p>
 
-<h2>Example</h2>
+<h2>Examples</h2>
 
-<div class="combric-docs-example">
-  {slug === "toast" ? (
-    <ExampleRenderer slug={slug} client:load />
-  ) : (
-    <ExampleRenderer slug={slug} client:load />
-  )}
-</div>
-
-<CopyButton text={example.source} client:load />
-<pre
-  class="combric-docs-source"
-  tabindex="0"
-><code>{example.source}</code></pre>
+{demos.map((demo) => (
+  <section class="combric-docs-demo" data-demo-id={demo.id}>
+    <h3>{demo.title}</h3>
+    <div class="combric-docs-example">
+      <ExampleRenderer demoId={demo.id} client:load />
+    </div>
+    <details class="combric-docs-code">
+      <summary>View Code</summary>
+      <pre
+        class="combric-docs-source"
+        tabindex="0"
+      ><code>{demo.source}</code></pre>
+    </details>
+    <CopyButton text={demo.source} label="Copy Code" client:load />
+  </section>
+))}
 
 <h2>Public API</h2>
 

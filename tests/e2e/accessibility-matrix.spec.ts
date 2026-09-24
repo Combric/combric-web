@@ -1,28 +1,52 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
+import { catalogue, catalogueRoute } from "../../src/data/catalogue";
+import {
+  catalogueDemoMetadata,
+  catalogueTestScenarioIds,
+} from "../../src/data/catalogue-demos";
+import { currentDocumentationVersion } from "../../src/data/versions";
 
-const routes = [
-  ["Accordion", "/docs/latest/components/disclosure/accordion/"],
-  ["Checkbox", "/docs/latest/components/forms/checkbox/"],
-  ["RadioGroup", "/docs/latest/components/forms/radio-group/"],
-  ["Switch", "/docs/latest/components/forms/switch/"],
-  ["Slider", "/docs/latest/components/forms/slider/"],
-  ["Select", "/docs/latest/components/forms/select/"],
-  ["Tabs", "/docs/latest/components/navigation/tabs/"],
-  ["Dialog", "/docs/latest/components/overlays/dialog/"],
-  ["Drawer / Sheet", "/docs/latest/components/overlays/drawer/"],
-  ["DropdownMenu", "/docs/latest/components/overlays/dropdown-menu/"],
-  ["Popover", "/docs/latest/components/overlays/popover/"],
-  ["Tooltip", "/docs/latest/components/overlays/tooltip/"],
-  ["Toast", "/docs/latest/components/feedback/toast/"],
-  ["Toggle", "/docs/latest/components/actions/toggle/"],
-  ["ToggleGroup", "/docs/latest/components/actions/toggle-group/"],
-] as const;
+const scenarioLabels: Record<
+  (typeof catalogueTestScenarioIds)[number],
+  string
+> = {
+  accordion: "Accordion",
+  checkbox: "Checkbox",
+  "radio-group": "RadioGroup",
+  switch: "Switch",
+  slider: "Slider",
+  select: "Select",
+  tabs: "Tabs",
+  dialog: "Dialog",
+  drawer: "Drawer / Sheet",
+  "dropdown-menu": "DropdownMenu",
+  popover: "Popover",
+  tooltip: "Tooltip",
+  toast: "Toast",
+  toggle: "Toggle",
+  "toggle-group": "ToggleGroup",
+};
 
-async function exercise(page: Page, family: string): Promise<void> {
-  switch (family) {
-    case "Accordion": {
+const demosUnderTest = catalogueDemoMetadata.filter(
+  (demo) => demo.testScenario,
+);
+const scenarios = demosUnderTest.map((demo) => {
+  const item = catalogue.find((entry) => entry.slug === demo.catalogueSlug);
+  if (!item || !demo.testScenario)
+    throw new Error(`Invalid test demo: ${demo.id}`);
+  return [
+    scenarioLabels[demo.testScenario as keyof typeof scenarioLabels],
+    catalogueRoute(currentDocumentationVersion, item),
+    demo.testScenario,
+    demo.id,
+  ] as const;
+});
+
+async function exercise(page: Page, scenario: string): Promise<void> {
+  switch (scenario) {
+    case "accordion": {
       const trigger = page.getByRole("button", { name: "Details" });
       await expect(trigger).toHaveAttribute("aria-expanded", "true");
       await trigger.click();
@@ -31,7 +55,7 @@ async function exercise(page: Page, family: string): Promise<void> {
       await expect(trigger).toHaveAttribute("aria-expanded", "true");
       break;
     }
-    case "Checkbox": {
+    case "checkbox": {
       const control = page.getByRole("checkbox", {
         name: "Include archived projects",
       });
@@ -41,7 +65,7 @@ async function exercise(page: Page, family: string): Promise<void> {
       await expect(control).not.toBeChecked();
       break;
     }
-    case "RadioGroup": {
+    case "radio-group": {
       const starter = page.getByRole("radio", { name: "Starter" });
       const pro = page.getByRole("radio", { name: "Pro" });
       await expect(starter).toBeChecked();
@@ -50,7 +74,7 @@ async function exercise(page: Page, family: string): Promise<void> {
       await expect(starter).not.toBeChecked();
       break;
     }
-    case "Switch": {
+    case "switch": {
       const control = page.getByRole("switch", { name: "Notifications" });
       await expect(control).toBeChecked();
       await control.focus();
@@ -58,7 +82,7 @@ async function exercise(page: Page, family: string): Promise<void> {
       await expect(control).not.toBeChecked();
       break;
     }
-    case "Slider": {
+    case "slider": {
       const control = page.getByRole("slider", { name: "Volume" });
       await expect(control).toHaveValue("50");
       await control.focus();
@@ -66,14 +90,14 @@ async function exercise(page: Page, family: string): Promise<void> {
       await expect(control).toHaveValue("51");
       break;
     }
-    case "Select": {
+    case "select": {
       const control = page.getByRole("combobox", { name: "Region" });
       await expect(control).toHaveValue("eu");
       await control.selectOption("us");
       await expect(control).toHaveValue("us");
       break;
     }
-    case "Tabs": {
+    case "tabs": {
       const overview = page.getByRole("tab", { name: "Overview" });
       const activity = page.getByRole("tab", { name: "Activity" });
       await expect(overview).toHaveAttribute("aria-selected", "true");
@@ -86,10 +110,10 @@ async function exercise(page: Page, family: string): Promise<void> {
       ).toBeVisible();
       break;
     }
-    case "Dialog":
-    case "Drawer / Sheet": {
+    case "dialog":
+    case "drawer": {
       const trigger = page.getByRole("button", {
-        name: family === "Dialog" ? "Open dialog" : "Filters",
+        name: scenario === "dialog" ? "Open dialog" : "Filters",
       });
       await trigger.click();
       const dialog = page.getByRole("dialog");
@@ -102,7 +126,7 @@ async function exercise(page: Page, family: string): Promise<void> {
       await expect(dialog).toBeVisible();
       break;
     }
-    case "DropdownMenu": {
+    case "dropdown-menu": {
       const trigger = page.getByRole("button", { name: "Actions" });
       await trigger.click();
       await expect(page.getByRole("menu")).toBeVisible();
@@ -115,7 +139,7 @@ async function exercise(page: Page, family: string): Promise<void> {
       await trigger.click();
       break;
     }
-    case "Popover": {
+    case "popover": {
       const trigger = page.getByRole("button", { name: "Details" });
       await trigger.click();
       await expect(
@@ -129,13 +153,13 @@ async function exercise(page: Page, family: string): Promise<void> {
       await trigger.click();
       break;
     }
-    case "Tooltip": {
+    case "tooltip": {
       const trigger = page.getByRole("button", { name: "Help" });
       await trigger.focus();
       await expect(page.getByRole("tooltip")).toBeVisible();
       break;
     }
-    case "Toast": {
+    case "toast": {
       await expect(
         page.getByRole("list", { name: "Notifications" }),
       ).toBeVisible();
@@ -144,14 +168,14 @@ async function exercise(page: Page, family: string): Promise<void> {
       await expect(page.getByText("Saved", { exact: true })).toBeHidden();
       break;
     }
-    case "Toggle": {
+    case "toggle": {
       const control = page.getByRole("button", { name: "Pin project" });
       await expect(control).toHaveAttribute("aria-pressed", "true");
       await control.press("Space");
       await expect(control).toHaveAttribute("aria-pressed", "false");
       break;
     }
-    case "ToggleGroup": {
+    case "toggle-group": {
       const list = page.getByRole("button", { name: "List" });
       const grid = page.getByRole("button", { name: "Grid" });
       await expect(list).toHaveAttribute("aria-pressed", "true");
@@ -172,13 +196,15 @@ test.describe("catalogue accessibility regression matrix", () => {
     "Desktop keyboard matrix; mobile navigation is covered separately.",
   );
 
-  for (const [family, route] of routes) {
+  for (const [family, route, scenario, demoId] of scenarios) {
     test(`${family}: real example, behavior and axe`, async ({ page }) => {
       await page.goto(route);
-      await expect(page.locator(".combric-docs-example")).toBeVisible();
-      await exercise(page, family);
+      await expect(
+        page.locator(`[data-demo-id="${demoId}"] .combric-docs-example`),
+      ).toBeVisible();
+      await exercise(page, scenario);
       const builder = new AxeBuilder({ page });
-      if (["DropdownMenu", "Popover", "Tooltip", "Toast"].includes(family)) {
+      if (["dropdown-menu", "popover", "tooltip", "toast"].includes(scenario)) {
         // Non-modal portals intentionally live outside the docs page landmarks.
         // The docs shell's landmark coverage is tested on ordinary pages.
         builder.disableRules(["region"]);

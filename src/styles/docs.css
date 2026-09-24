@@ -42,6 +42,18 @@ starlight-theme-select {
   white-space: pre;
 }
 
+.combric-docs-demo {
+  display: grid;
+  gap: var(--combric-space-3);
+  margin-block: var(--combric-space-6);
+}
+
+.combric-docs-code > summary {
+  cursor: pointer;
+  width: fit-content;
+  color: var(--combric-color-accent);
+}
+
 .combric-docs-token-table {
   width: 100%;
   min-width: 44rem;
