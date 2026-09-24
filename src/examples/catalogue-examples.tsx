@@ -102,6 +102,9 @@ import {
   TooltipTrigger,
 } from "@combric/react";
 import type { ComponentType } from "react";
+import { catalogue } from "../data/catalogue";
+import { catalogueDemoMetadata } from "../data/catalogue-demos";
+import { currentDocumentationVersion } from "../data/versions";
 
 export interface ExampleDefinition {
   readonly Component: ComponentType;
@@ -111,13 +114,21 @@ export interface ExampleDefinition {
 const define = (Component: ComponentType, source: string): ExampleDefinition =>
   Object.freeze({ Component, source: source.trim() });
 
-export const examples: Readonly<Record<string, ExampleDefinition>> = {
+const componentExamples: Readonly<Record<string, ExampleDefinition>> = {
   button: define(
     () => <Button>Save changes</Button>,
     `import { Button } from "@combric/react";
 
 export function Example() {
   return <Button>Save changes</Button>;
+}`,
+  ),
+  "button-disabled": define(
+    () => <Button disabled>Save changes</Button>,
+    `import { Button } from "@combric/react";
+
+export function Example() {
+  return <Button disabled>Save changes</Button>;
 }`,
   ),
   toggle: define(
@@ -614,3 +625,42 @@ export function Example() {
 }`,
   ),
 };
+
+export interface CanonicalCatalogueDemo extends ExampleDefinition {
+  readonly id: string;
+  readonly version: string;
+  readonly catalogueSlug: string;
+  readonly title: string;
+  readonly testScenario?: string;
+}
+
+export const canonicalCatalogueDemos: readonly CanonicalCatalogueDemo[] =
+  Object.freeze(
+    catalogueDemoMetadata.map((metadata) => {
+      const example = componentExamples[metadata.exampleKey];
+      const component = catalogue.find(
+        (item) => item.slug === metadata.catalogueSlug,
+      );
+      if (
+        !example ||
+        !component ||
+        metadata.version !== currentDocumentationVersion.id
+      )
+        throw new Error(`Invalid canonical demo metadata: ${metadata.id}`);
+      return Object.freeze({
+        ...metadata,
+        Component: example.Component,
+        source: example.source,
+      });
+    }),
+  );
+
+export function catalogueDemosFor(version: string, slug: string) {
+  return canonicalCatalogueDemos.filter(
+    (demo) => demo.version === version && demo.catalogueSlug === slug,
+  );
+}
+
+export function catalogueDemoById(id: string) {
+  return canonicalCatalogueDemos.find((demo) => demo.id === id);
+}

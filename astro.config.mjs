@@ -11,9 +11,10 @@ import {
 
 const configuredSite = process.env.COMBRIC_DOCS_SITE_URL;
 const docs = (path) => docsRoute(currentDocumentationVersion, path);
-const legacyRedirects = Object.fromEntries(
-  legacyDocumentationPaths.map((path) => [`/${path}/`, latestRoute(path)]),
-);
+const legacyRedirects = Object.fromEntries([
+  ...legacyDocumentationPaths.map((path) => [`/${path}/`, latestRoute(path)]),
+  ...catalogue.map((entry) => [entry.route, latestRoute(entry.route)]),
+]);
 const componentGroups = catalogue.reduce((groups, entry) => {
   const items = groups.get(entry.group) ?? [];
   items.push({ label: entry.title, link: docs(entry.route) });

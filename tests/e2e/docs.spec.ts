@@ -16,20 +16,36 @@ test("desktop navigation and ordinary component documentation work", async ({
   await expect(
     page.getByRole("heading", { level: 1, name: "Combric" }),
   ).toBeVisible();
-  await page.goto("/docs/latest/components/actions/button/");
+  await page.goto("/docs/v1.0.0/components/actions/button/");
   await expect(
     page.getByRole("heading", { level: 1, name: "Button" }),
   ).toBeVisible();
+  const buttonDemo = page.locator('[data-demo-id="v1.0.0/button/default"]');
   await expect(
-    page.getByRole("button", { name: "Save changes" }),
+    buttonDemo.getByRole("button", { name: "Save changes" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Copy example code" }).click();
-  await expect(page.getByRole("status")).toHaveText("Copied.");
+  await buttonDemo.getByText("View Code", { exact: true }).click();
+  const displayedSource = await buttonDemo
+    .locator(".combric-docs-source code")
+    .innerText();
+  await buttonDemo.getByRole("button", { name: "Copy Code" }).click();
+  await expect(buttonDemo.getByRole("status")).toHaveText("Copied.");
+  await expect
+    .poll(() =>
+      page
+        .evaluate(() => navigator.clipboard.readText())
+        .then((source) => source.replace(/\r\n/g, "\n")),
+    )
+    .toBe(displayedSource.replace(/\r\n/g, "\n"));
+  const disabledDemo = page.locator('[data-demo-id="v1.0.0/button/disabled"]');
+  await expect(
+    disabledDemo.getByRole("button", { name: "Save changes" }),
+  ).toBeDisabled();
   await expectNoAxeViolations(page);
 });
 
 test("dialog keyboard dismissal restores focus", async ({ page }) => {
-  await page.goto("/docs/latest/components/overlays/dialog/");
+  await page.goto("/docs/v1.0.0/components/overlays/dialog/");
   const trigger = page.getByRole("button", { name: "Open dialog" });
   await trigger.click();
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -40,7 +56,7 @@ test("dialog keyboard dismissal restores focus", async ({ page }) => {
 });
 
 test("Color Map exposes canonical and derived data", async ({ page }) => {
-  await page.goto("/docs/latest/foundations/colors/");
+  await page.goto("/docs/v1.0.0/foundations/colors/");
   await expect(
     page.getByRole("heading", { name: "Primitive palette" }),
   ).toBeVisible();
@@ -99,6 +115,18 @@ test("versioned documentation, latest routing and selector preserve deep paths",
   ).toBeVisible();
 });
 
+test("legacy component route redirects to current versioned documentation", async ({
+  page,
+}) => {
+  await page.goto("/components/actions/button/");
+  await expect(page).toHaveURL(
+    /\/docs\/v1\.0\.0\/components\/actions\/button\/?$/,
+  );
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Button" }),
+  ).toBeVisible();
+});
+
 test("unknown routes use the accessible 404 page", async ({ page }) => {
   const response = await page.goto("/not-a-real-combric-route/");
   expect(response?.status()).toBe(404);
@@ -111,7 +139,7 @@ test.describe("mobile documentation", () => {
   test.skip(({ isMobile }) => !isMobile, "mobile project only");
 
   test("mobile navigation opens and remains accessible", async ({ page }) => {
-    await page.goto("/docs/latest/getting-started/");
+    await page.goto("/docs/v1.0.0/getting-started/");
     const menu = page.getByRole("button", { name: /menu/i }).first();
     await menu.click();
     await expect(

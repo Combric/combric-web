@@ -15,7 +15,6 @@ export interface CatalogueEntry {
   readonly publicExports: readonly string[];
   readonly aliases?: Readonly<Record<string, string>>;
   readonly package: "@combric/react";
-  readonly status: "unreleased";
   readonly summary: string;
   readonly api: readonly string[];
   readonly accessibility: string;
@@ -24,7 +23,7 @@ export interface CatalogueEntry {
   readonly playground: boolean;
 }
 
-type EntryInput = Omit<CatalogueEntry, "route" | "package" | "status">;
+type EntryInput = Omit<CatalogueEntry, "route" | "package">;
 
 function entry(input: EntryInput): CatalogueEntry {
   return Object.freeze({
@@ -34,7 +33,6 @@ function entry(input: EntryInput): CatalogueEntry {
       .replaceAll(" & ", "-")
       .replaceAll(" ", "-")}/${input.slug}/`,
     package: "@combric/react",
-    status: "unreleased",
   });
 }
 
