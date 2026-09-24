@@ -7,7 +7,7 @@ export default function Preview({
 }) {
   const value = String(props.value);
   return (
-    <Tabs value={value} onValueChange={() => undefined}>
+    <Tabs defaultValue={value}>
       <TabsList aria-label="Project sections">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="activity">Activity</TabsTrigger>

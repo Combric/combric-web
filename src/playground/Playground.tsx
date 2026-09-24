@@ -21,11 +21,12 @@ export function Playground() {
   );
   const [viewport, setViewport] = useState<Viewport>("desktop");
   const [frameKey, setFrameKey] = useState(0);
+  const [hydrated, setHydrated] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
   const entry = getPlaygroundEntry(family);
   const source = useMemo(
     () =>
-      `import { ${entry.label.replace(" / Sheet", "").replaceAll(" ", "")} } from "@combric/react";\n\nexport function Example() {\n  return (${entry.code(props)});\n}`,
+      `import { ${entry.imports.join(", ")} } from "@combric/react";\n\nexport function Example() {\n  return (${entry.code(props)});\n}`,
     [entry, props],
   );
 
@@ -37,11 +38,15 @@ export function Playground() {
   }
 
   useEffect(send, [family, props, frameKey]);
+  useEffect(() => setHydrated(true), []);
   useEffect(() => {
     const ready = (event: MessageEvent) => {
       if (
         event.origin === window.location.origin &&
         event.source === frame.current?.contentWindow &&
+        typeof event.data === "object" &&
+        event.data !== null &&
+        !Array.isArray(event.data) &&
         (event.data as { type?: unknown }).type === "combric-playground-ready"
       )
         send();
@@ -67,7 +72,7 @@ export function Playground() {
   }
 
   return (
-    <div className="combric-playground">
+    <div className="combric-playground" data-hydrated={hydrated}>
       <section
         className="combric-playground__controls"
         aria-label="Playground controls"
@@ -164,6 +169,7 @@ export function Playground() {
       <section
         aria-label="Component preview"
         className="combric-playground__stage"
+        tabIndex={0}
       >
         <iframe
           key={frameKey}

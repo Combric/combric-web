@@ -179,6 +179,10 @@ test("Native CSS and Tailwind previews share canonical tokens and responsive con
 
 test("Playground controls update code and viewport", async ({ page }) => {
   await page.goto("/playground/");
+  await expect(page.locator(".combric-playground")).toHaveAttribute(
+    "data-hydrated",
+    "true",
+  );
   await expect(
     page.getByRole("heading", { level: 1, name: "Playground" }),
   ).toBeVisible();

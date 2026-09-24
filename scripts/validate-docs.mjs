@@ -5,6 +5,7 @@ import {
   catalogueDemoMetadata,
   catalogueTestScenarioIds,
 } from "../src/data/catalogue-demos.ts";
+import { playgroundEntries } from "../src/playground/registry.ts";
 import {
   currentDocumentationVersion,
   documentationVersions,
@@ -18,6 +19,63 @@ const catalogueSource = readFileSync(
   join(root, "src/data/catalogue.ts"),
   "utf8",
 );
+const catalogueAst = ts.createSourceFile(
+  join(root, "src/data/catalogue.ts"),
+  catalogueSource,
+  ts.ScriptTarget.Latest,
+  true,
+  ts.ScriptKind.TS,
+);
+const componentCatalogue = [];
+function collectCatalogueEntries(node) {
+  if (
+    ts.isCallExpression(node) &&
+    ts.isIdentifier(node.expression) &&
+    node.expression.text === "entry" &&
+    node.arguments[0] &&
+    ts.isObjectLiteralExpression(node.arguments[0])
+  ) {
+    const properties = new Map(
+      node.arguments[0].properties
+        .filter(ts.isPropertyAssignment)
+        .map((property) => [
+          property.name.getText(catalogueAst),
+          property.initializer,
+        ]),
+    );
+    const stringValue = (name) => {
+      const value = properties.get(name);
+      return value && ts.isStringLiteral(value) ? value.text : undefined;
+    };
+    const slug = stringValue("slug");
+    if (slug)
+      componentCatalogue.push({
+        slug,
+        playground:
+          properties.get("playground")?.kind === ts.SyntaxKind.TrueKeyword,
+        publicExports: (() => {
+          const value = properties.get("publicExports");
+          return value && ts.isArrayLiteralExpression(value)
+            ? value.elements.filter(ts.isStringLiteral).map((item) => item.text)
+            : [];
+        })(),
+        aliases: (() => {
+          const value = properties.get("aliases");
+          return value && ts.isObjectLiteralExpression(value)
+            ? value.properties
+                .filter(ts.isPropertyAssignment)
+                .map((property) =>
+                  property.name
+                    .getText(catalogueAst)
+                    .replace(/^['"]|['"]$/g, ""),
+                )
+            : [];
+        })(),
+      });
+  }
+  ts.forEachChild(node, collectCatalogueEntries);
+}
+collectCatalogueEntries(catalogueAst);
 if (currentDocumentationVersion.id !== "v1.0.0")
   failures.push("Current documentation version must be v1.0.0");
 if (
@@ -245,19 +303,89 @@ if (!examplesObject || !ts.isObjectLiteralExpression(examplesObject)) {
 
 const playgroundRoot = join(root, "src/playground");
 if (existsSync(playgroundRoot)) {
-  const playgroundFiles = readdirSync(playgroundRoot, {
-    recursive: true,
-  }).filter(
-    (file) => String(file).endsWith(".ts") || String(file).endsWith(".tsx"),
-  );
-  const playgroundText = playgroundFiles
-    .map((file) => readFileSync(join(playgroundRoot, file), "utf8"))
-    .join("\n");
-  const playgroundIds = [
-    ...playgroundText.matchAll(/id:\s*["']([^"']+)["']/g),
-  ].map((match) => match[1]);
-  if (new Set(playgroundIds).size !== playgroundIds.length)
+  const previewIds = readdirSync(join(playgroundRoot, "previews"))
+    .filter((file) => file.endsWith(".tsx"))
+    .map((file) => file.slice(0, -4));
+  const playgroundIds = playgroundEntries.map((item) => item.id);
+  const playgroundIdSet = new Set(playgroundIds);
+  if (playgroundIdSet.size !== playgroundIds.length)
     failures.push("Playground IDs are not unique");
+  if (
+    previewIds.length !== playgroundIds.length ||
+    previewIds.some((id) => !playgroundIdSet.has(id)) ||
+    playgroundIds.some((id) => !previewIds.includes(id))
+  )
+    failures.push("Playground registry and preview modules must match exactly");
+
+  const catalogueBySlug = new Map(
+    componentCatalogue.map((item) => [item.slug, item]),
+  );
+  const publicExports = new Set(
+    componentCatalogue.flatMap((item) => [
+      ...item.publicExports,
+      ...item.aliases,
+    ]),
+  );
+  for (const item of playgroundEntries) {
+    const catalogueItem = catalogueBySlug.get(item.id);
+    if (!catalogueItem)
+      failures.push(`Playground family ${item.id} is not in the catalogue`);
+    else if (!catalogueItem.playground)
+      failures.push(
+        `Catalogue family ${item.id} is not marked Playground-ready`,
+      );
+    for (const imported of item.imports)
+      if (!publicExports.has(imported))
+        failures.push(
+          `Playground ${item.id} imports non-public export ${imported}`,
+        );
+    if (
+      item.controls.length !== Object.keys(item.defaults).length ||
+      new Set(item.controls.map((control) => control.name)).size !==
+        item.controls.length
+    )
+      failures.push(`Playground ${item.id} controls/defaults are inconsistent`);
+    for (const control of item.controls) {
+      if (
+        control.kind === "enum" &&
+        !control.options.includes(String(item.defaults[control.name]))
+      )
+        failures.push(`Playground ${item.id} has an invalid enum default`);
+      if (
+        control.kind === "number" &&
+        (typeof item.defaults[control.name] !== "number" ||
+          item.defaults[control.name] < control.min ||
+          item.defaults[control.name] > control.max ||
+          control.step <= 0)
+      )
+        failures.push(`Playground ${item.id} has an invalid number default`);
+      if (
+        control.kind === "boolean" &&
+        typeof item.defaults[control.name] !== "boolean"
+      )
+        failures.push(`Playground ${item.id} has an invalid boolean default`);
+      if (
+        control.kind === "text" &&
+        typeof item.defaults[control.name] !== "string"
+      )
+        failures.push(`Playground ${item.id} has an invalid text default`);
+    }
+    const generated = `import { ${item.imports.join(", ")} } from "@combric/react";\nfunction Example() { return (${item.code(item.defaults)}); }`;
+    const source = ts.createSourceFile(
+      `${item.id}.tsx`,
+      generated,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TSX,
+    );
+    if (source.parseDiagnostics.length)
+      failures.push(`Playground ${item.id} generates invalid TSX`);
+  }
+  for (const item of componentCatalogue)
+    if (item.playground && !playgroundIdSet.has(item.slug))
+      failures.push(
+        `Playground-ready catalogue family ${item.slug} has no preview`,
+      );
 }
 
 if (failures.length) {
