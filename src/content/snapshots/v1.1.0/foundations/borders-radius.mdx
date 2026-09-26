@@ -1,0 +1,26 @@
+---
+title: Borders & Radius
+description: Canonical border and radius tokens in the published v1.1.0 package.
+---
+
+import TokenTable from "../../../../components/TokenTable.astro";
+
+The published `@combric/tokens@1.1.0` package separates structural and
+functional geometry. The general `--combric-radius` remains square; published
+components use the role-specific tokens below rather than inheriting that value.
+
+| Semantic token                                      | Default    | Used for                       |
+| --------------------------------------------------- | ---------- | ------------------------------ |
+| `--combric-radius-button`                           | `0.25rem`  | Button                         |
+| `--combric-radius-card`                             | `0.25rem`  | Card                           |
+| `--combric-radius-checkbox`                         | `0.125rem` | Checkbox                       |
+| `--combric-radius-control`                          | `0.25rem`  | Inputs and functional controls |
+| `--combric-radius-surface`                          | `0.25rem`  | Structural surfaces            |
+| `--combric-radius-overlay`                          | `0.5rem`   | Overlays                       |
+| `--combric-radius-circle` / `--combric-radius-pill` | `9999px`   | Circular and pill geometry     |
+
+Button and Card also accept the public `radius` presets `none`, `sm`, `md`,
+`lg`, and `full`. Their default is `md`. Borders continue to use the canonical
+width and style roles.
+
+<TokenTable prefix={["border.", "radius"]} />

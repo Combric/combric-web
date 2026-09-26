@@ -17,6 +17,7 @@ export interface CatalogueEntry {
   readonly package: "@combric/react";
   readonly summary: string;
   readonly api: readonly string[];
+  readonly apiByVersion?: Readonly<Record<string, readonly string[]>>;
   readonly accessibility: string;
   readonly keyboard?: string;
   readonly source: string;
@@ -36,6 +37,26 @@ function entry(input: EntryInput): CatalogueEntry {
   });
 }
 
+function compareSemVer(left: string, right: string) {
+  const leftParts = left.replace(/^v/, "").split(".").map(Number);
+  const rightParts = right.replace(/^v/, "").split(".").map(Number);
+  for (let index = 0; index < 3; index += 1) {
+    if (leftParts[index] !== rightParts[index])
+      return leftParts[index]! - rightParts[index]!;
+  }
+  return 0;
+}
+
+export function catalogueApiForVersion(
+  item: CatalogueEntry,
+  version: string,
+): readonly string[] {
+  const applicable = Object.entries(item.apiByVersion ?? {})
+    .filter(([introducedIn]) => compareSemVer(version, introducedIn) >= 0)
+    .sort(([left], [right]) => compareSemVer(left, right));
+  return applicable.at(-1)?.[1] ?? item.api;
+}
+
 export const catalogue = Object.freeze([
   entry({
     slug: "button",
@@ -48,6 +69,14 @@ export const catalogue = Object.freeze([
       "size: sm | md | lg",
       "type defaults to button",
     ],
+    apiByVersion: {
+      "v1.1.0": [
+        "variant: primary | secondary | ghost | accent | danger",
+        "size: sm | md | lg",
+        "radius: none | sm | md | lg | full",
+        "type defaults to button",
+      ],
+    },
     accessibility:
       "Retains native button semantics, disabled behavior, and consumer-provided accessible naming.",
     keyboard: "Native Enter and Space activation.",
@@ -282,7 +311,7 @@ export const catalogue = Object.freeze([
     group: "Data & Display",
     publicExports: ["Avatar", "AvatarImage", "AvatarFallback"],
     summary:
-      "Image and deterministic fallback composition with square Metriq geometry.",
+      "Image and deterministic fallback composition with three published sizes.",
     api: ["size: sm | md | lg", "AvatarImage requires alt", "AvatarFallback"],
     accessibility:
       "Preserves native image alternative text; fallback changes do not invent presence semantics.",
@@ -319,6 +348,14 @@ export const catalogue = Object.freeze([
       "Native props for each rendered element",
       "compositional subcomponents",
     ],
+    apiByVersion: {
+      "v1.1.0": [
+        "tone: surface | muted | elevated",
+        "radius: none | sm | md | lg | full",
+        "Native props for each rendered element",
+        "compositional subcomponents",
+      ],
+    },
     accessibility:
       "Semantic structure is preserved; consumers remain responsible for the surrounding document outline.",
     source: "packages/react/src/card.tsx",

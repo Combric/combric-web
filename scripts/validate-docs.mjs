@@ -15,6 +15,10 @@ import {
 
 const root = process.cwd();
 const failures = [];
+const currentSnapshotPath = (path) =>
+  join(root, "src/content/snapshots", currentDocumentationVersion.id, path);
+const currentSnapshotRelative = (path) =>
+  join("src", "content", "snapshots", currentDocumentationVersion.id, path);
 const catalogueSource = readFileSync(
   join(root, "src/data/catalogue.ts"),
   "utf8",
@@ -109,23 +113,33 @@ const snapshotIds = readdirSync(join(root, "src/content/snapshots"), {
   .sort();
 if ([...versionIds].sort().join("\n") !== snapshotIds.join("\n"))
   failures.push("Available documentation versions and snapshots must match");
-if (currentDocumentationVersion.id !== "v1.0.0")
-  failures.push("Current stable documentation must remain v1.0.0");
-if (existsSync(join(root, "src/content/docs/docs/v1.0.0")))
-  failures.push("Duplicate v1.0.0 content tree");
+if (
+  currentDocumentationVersion.id !==
+  `v${currentDocumentationVersion.packageVersion}`
+)
+  failures.push(
+    "Current documentation ID must exactly match its package SemVer",
+  );
+if (
+  existsSync(
+    join(root, "src/content/docs/docs", currentDocumentationVersion.id),
+  )
+)
+  failures.push(`Duplicate ${currentDocumentationVersion.id} content tree`);
 const required = [
   "src/data/catalogue.ts",
   "src/playground",
-  "src/content/snapshots/v1.0.0/layout/container.mdx",
-  "src/content/snapshots/v1.0.0/layout/stack.mdx",
-  "src/content/snapshots/v1.0.0/layout/inline.mdx",
-  "src/content/snapshots/v1.0.0/layout/cluster.mdx",
-  "src/content/snapshots/v1.0.0/layout/grid.mdx",
-  "src/content/snapshots/v1.0.0/foundations/colors.mdx",
-  "src/content/snapshots/v1.0.0/getting-started/cli.mdx",
-  "src/content/snapshots/v1.0.0/getting-started/installation.mdx",
-  "src/content/snapshots/v1.0.0/reference/packages.mdx",
-  "src/content/snapshots/v1.0.0/reference/guard.mdx",
+  currentSnapshotRelative("index.mdx"),
+  currentSnapshotRelative("layout/container.mdx"),
+  currentSnapshotRelative("layout/stack.mdx"),
+  currentSnapshotRelative("layout/inline.mdx"),
+  currentSnapshotRelative("layout/cluster.mdx"),
+  currentSnapshotRelative("layout/grid.mdx"),
+  currentSnapshotRelative("foundations/colors.mdx"),
+  currentSnapshotRelative("getting-started/cli.mdx"),
+  currentSnapshotRelative("getting-started/installation.mdx"),
+  currentSnapshotRelative("reference/packages.mdx"),
+  currentSnapshotRelative("reference/guard.mdx"),
   "src/styles/tailwind-demos.css",
   "src/assets/brand/combric-logo.png",
 ];
@@ -139,29 +153,29 @@ const packageJson = JSON.parse(
 );
 const packageLock = readFileSync(join(root, "pnpm-lock.yaml"), "utf8");
 const releaseDocs = readFileSync(
-  join(root, "src/content/snapshots/v1.0.0/reference/releasing.mdx"),
+  currentSnapshotPath("reference/releasing.mdx"),
   "utf8",
 );
 const packageDocs = readFileSync(
-  join(root, "src/content/snapshots/v1.0.0/reference/packages.mdx"),
+  currentSnapshotPath("reference/packages.mdx"),
   "utf8",
 );
 const supportDocs = readFileSync(
-  join(root, "src/content/snapshots/v1.0.0/reference/support.mdx"),
+  currentSnapshotPath("reference/support.mdx"),
   "utf8",
 );
 const readme = readFileSync(join(root, "README.md"), "utf8");
 const astroConfig = readFileSync(join(root, "astro.config.mjs"), "utf8");
 const cliDocs = readFileSync(
-  join(root, "src/content/snapshots/v1.0.0/getting-started/cli.mdx"),
+  currentSnapshotPath("getting-started/cli.mdx"),
   "utf8",
 );
 const guardDocs = readFileSync(
-  join(root, "src/content/snapshots/v1.0.0/reference/guard.mdx"),
+  currentSnapshotPath("reference/guard.mdx"),
   "utf8",
 );
 const installationDocs = readFileSync(
-  join(root, "src/content/snapshots/v1.0.0/getting-started/installation.mdx"),
+  currentSnapshotPath("getting-started/installation.mdx"),
   "utf8",
 );
 const registeredPackageNames = currentDocumentationVersion.packages.map(
@@ -191,7 +205,7 @@ if (
   )
 )
   failures.push(
-    "The v1.0.0 registry must contain only the six public packages",
+    "The current registry must contain only the six public packages",
   );
 if (
   /^\s+(?:specifier|version):\s+(?:workspace:|link:|portal:|file:|git\+)/m.test(
@@ -248,7 +262,9 @@ if (
   !cliDocs.includes("published") ||
   /not yet published|local tarball or\s+workspace until release/i.test(cliDocs)
 )
-  failures.push("CLI docs do not describe the published 1.0.0 package truth");
+  failures.push(
+    `CLI docs do not describe the published ${currentDocumentationVersion.packageVersion} package truth`,
+  );
 if (
   !guardDocs.includes(
     `@combric/guard@${currentDocumentationVersion.packageVersion}`,
@@ -276,7 +292,9 @@ if (
     installationDocs,
   )
 )
-  failures.push("Installation docs do not match the v1.0.0 published packages");
+  failures.push(
+    `Installation docs do not match the ${currentDocumentationVersion.id} published packages`,
+  );
 for (const [name, version] of Object.entries(packageJson.dependencies ?? {})) {
   if (name.startsWith("@combric/") && version.includes("workspace:"))
     failures.push(`Workspace dependency: ${name}`);
@@ -304,10 +322,8 @@ const catalogueSlugs = new Set(
   ),
 );
 for (const demo of catalogueDemoMetadata) {
-  if (demo.version !== currentDocumentationVersion.id)
-    failures.push(
-      `Demo ${demo.id} references an unavailable/non-current version`,
-    );
+  if (!versionIds.includes(demo.version))
+    failures.push(`Demo ${demo.id} references an unavailable version`);
   if (
     (!demo.kind || demo.kind === "component") &&
     !catalogueSlugs.has(demo.catalogueSlug)
@@ -320,9 +336,6 @@ for (const demo of catalogueDemoMetadata) {
   if (!demo.exampleKey || !demo.title.trim())
     failures.push(`Demo ${demo.id} is missing its example key or title`);
 }
-for (const slug of catalogueSlugs)
-  if (!catalogueDemoMetadata.some((demo) => demo.catalogueSlug === slug))
-    failures.push(`Catalogue family has no canonical demo: ${slug}`);
 const layoutSlugs = new Set([
   "container",
   "stack",
@@ -330,30 +343,48 @@ const layoutSlugs = new Set([
   "cluster",
   "grid",
 ]);
-for (const slug of layoutSlugs)
-  if (
-    !catalogueDemoMetadata.some(
-      (demo) => demo.kind === "layout" && demo.layoutSlug === slug,
+for (const version of documentationVersions) {
+  for (const slug of catalogueSlugs)
+    if (
+      !catalogueDemoMetadata.some(
+        (demo) => demo.version === version.id && demo.catalogueSlug === slug,
+      )
     )
-  )
-    failures.push(`Layout ${slug} has no canonical demo`);
-for (const comparisonId of ["foundation-surface", "responsive-grid"])
-  for (const approach of ["native-css", "tailwind"])
+      failures.push(
+        `Catalogue family has no canonical demo for ${version.id}: ${slug}`,
+      );
+  for (const slug of layoutSlugs)
     if (
       !catalogueDemoMetadata.some(
         (demo) =>
-          demo.kind === "styling" &&
-          demo.comparisonId === comparisonId &&
-          demo.approach === approach,
+          demo.version === version.id &&
+          demo.kind === "layout" &&
+          demo.layoutSlug === slug,
       )
     )
-      failures.push(`Incomplete ${comparisonId} comparison: ${approach}`);
+      failures.push(`Layout ${slug} has no canonical demo for ${version.id}`);
+  for (const comparisonId of ["foundation-surface", "responsive-grid"])
+    for (const approach of ["native-css", "tailwind"])
+      if (
+        !catalogueDemoMetadata.some(
+          (demo) =>
+            demo.version === version.id &&
+            demo.kind === "styling" &&
+            demo.comparisonId === comparisonId &&
+            demo.approach === approach,
+        )
+      )
+        failures.push(
+          `Incomplete ${version.id} ${comparisonId} comparison: ${approach}`,
+        );
+}
 if (
   existsSync(join(root, "src/examples/layout-examples.tsx")) ||
   existsSync(join(root, "src/examples/LayoutExampleRenderer.tsx"))
 )
   failures.push("Parallel layout example registry/renderer must not remain");
 const metadataScenarios = catalogueDemoMetadata
+  .filter((demo) => demo.version === currentDocumentationVersion.id)
   .map((demo) => demo.testScenario)
   .filter(Boolean);
 if (new Set(catalogueTestScenarioIds).size !== catalogueTestScenarioIds.length)
@@ -510,13 +541,18 @@ if (failures.length) {
   console.error(failures.map((failure) => `FAIL: ${failure}`).join("\n"));
   process.exitCode = 1;
 } else {
-  const canonicalRoot = join(root, "dist/docs/v1.0.0/index.html");
-  const canonicalDeep = join(
-    root,
-    "dist/docs/v1.0.0/components/actions/button/index.html",
+  const currentBuildPath = (...segments) =>
+    join(root, "dist", "docs", currentDocumentationVersion.id, ...segments);
+  const canonicalRoot = currentBuildPath("index.html");
+  const canonicalDeep = currentBuildPath(
+    "components",
+    "actions",
+    "button",
+    "index.html",
   );
-  const cliDoc = join(root, "dist/docs/v1.0.0/getting-started/cli/index.html");
-  const guardDoc = join(root, "dist/docs/v1.0.0/reference/guard/index.html");
+  const cliDoc = currentBuildPath("getting-started", "cli", "index.html");
+  const guardDoc = currentBuildPath("reference", "guard", "index.html");
+  const latestRoot = join(root, "dist/docs/latest/index.html");
   const accidental = join(root, "dist/docs/v100/index.html");
   const latestDeep = join(
     root,
@@ -531,6 +567,9 @@ if (failures.length) {
   const pagefindIndexes = join(root, "dist/pagefind/index");
   const latestHtml = existsSync(latestDeep)
     ? readFileSync(latestDeep, "utf8")
+    : "";
+  const latestRootHtml = existsSync(latestRoot)
+    ? readFileSync(latestRoot, "utf8")
     : "";
   const legacyHtml = existsSync(legacyComponent)
     ? readFileSync(legacyComponent, "utf8")
@@ -559,6 +598,7 @@ if (failures.length) {
       !existsSync(canonicalDeep) ||
       !existsSync(cliDoc) ||
       !existsSync(guardDoc) ||
+      !existsSync(latestRoot) ||
       !existsSync(latestDeep) ||
       !existsSync(legacyComponent) ||
       !existsSync(pagefindEntry) ||
@@ -569,7 +609,10 @@ if (failures.length) {
     process.exitCode = 1;
   } else {
     if (
-      !latestHtml.includes("/docs/v1.0.0/components/actions/button") ||
+      !latestRootHtml.includes(docsRoute(currentDocumentationVersion)) ||
+      !latestHtml.includes(
+        docsRoute(currentDocumentationVersion, "components/actions/button"),
+      ) ||
       !legacyHtml.includes("/docs/latest/components/actions/button")
     ) {
       console.error(

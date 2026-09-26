@@ -1,0 +1,19 @@
+---
+title: Packages
+description: Current Combric package boundaries and release status.
+---
+
+| Package             | Stable contract                     | 1.0 release state            |
+| ------------------- | ----------------------------------- | ---------------------------- |
+| `@combric/tokens`   | Typed tokens and CSS variables      | Stable `1.1.0`, published    |
+| `@combric/layout`   | Framework-independent CSS layout    | Stable `1.1.0`, published    |
+| `@combric/react`    | React 19 component catalogue        | Stable `1.1.0`, published    |
+| `@combric/tailwind` | Optional Tailwind v4 adapter        | Stable `1.1.0`, published    |
+| `@combric/cli`      | Optional setup and diagnostics      | Stable `1.1.0`, published    |
+| `@combric/guard`    | Optional read-only consumer checker | Stable `1.1.0`, published    |
+| `@combric/core`     | Empty private repository boundary   | Excluded from public release |
+
+The six public packages use synchronized version `1.1.0` and are published on npm.
+The release-quality check installs these exact versions from the public npm
+registry in an isolated consumer fixture; it does not use framework source,
+workspace links, or local tarballs.

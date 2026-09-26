@@ -1,0 +1,22 @@
+---
+import { ExampleRenderer } from "../examples/ExampleRenderer";
+import { DemoActions } from "./DemoActions";
+
+interface Props {
+  demo: {
+    id: string;
+    title: string;
+    source: string;
+  };
+}
+
+const { demo } = Astro.props;
+---
+
+<article class="combric-docs-demo not-content" data-demo-id={demo.id}>
+  <h3 class="combric-docs-demo__title">{demo.title}</h3>
+  <div class="combric-docs-example">
+    <ExampleRenderer demoId={demo.id} client:load />
+  </div>
+  <DemoActions demoId={demo.id} source={demo.source} client:load />
+</article>

@@ -2,7 +2,7 @@
 
 Official Combric website, documentation, component catalogue, Playground, and
 reference consumer. This standalone application consumes the published public
-Combric packages (`1.0.0`) and never depends on the framework repository.
+Combric packages (`1.1.1`) and never depends on the framework repository.
 
 ## Local development
 
@@ -33,6 +33,6 @@ This is a static Astro/Starlight site. Use Node 24 and pnpm 10, install with
 `dist/`; the origin must be an approved absolute `http(s)` origin without
 credentials, query, or hash. The build emits Pagefind assets, sitemap,
 canonical metadata, and `/robots.txt` with its sitemap reference. Before
-release, verify `/`, `/docs/latest/`, `/docs/v1.0.0/`, `/playground/`, search,
+release, verify `/`, `/docs/latest/`, `/docs/v1.1.1/`, `/playground/`, search,
 the sitemap, robots, and the 404 route on the selected host. Hosting headers
 and DNS remain provider responsibilities and are still a manual gate.

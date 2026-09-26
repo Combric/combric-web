@@ -26,6 +26,7 @@ const componentGroups = catalogue.reduce((groups, entry) => {
 const componentSidebar = [...componentGroups].map(([label, items]) => ({
   label,
   items,
+  collapsed: true,
 }));
 
 export default defineConfig({
@@ -36,6 +37,13 @@ export default defineConfig({
       logo: {
         src: "./src/assets/brand/combric-logo.png",
         alt: "Combric mark",
+      },
+      components: {
+        SiteTitle: "./src/components/SiteTitle.astro",
+      },
+      tableOfContents: {
+        minHeadingLevel: 2,
+        maxHeadingLevel: 3,
       },
       customCss: ["./src/styles/docs.css", "./src/styles/tailwind-demos.css"],
       pagefind: true,

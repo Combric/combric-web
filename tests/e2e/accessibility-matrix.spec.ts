@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { catalogue, catalogueRoute } from "../../src/data/catalogue";
 import {
   catalogueDemoMetadata,
@@ -30,7 +30,8 @@ const scenarioLabels: Record<
 };
 
 const demosUnderTest = catalogueDemoMetadata.filter(
-  (demo) => demo.testScenario,
+  (demo) =>
+    demo.version === currentDocumentationVersion.id && demo.testScenario,
 );
 const scenarios = demosUnderTest.map((demo) => {
   const item = catalogue.find((entry) => entry.slug === demo.catalogueSlug);
@@ -44,10 +45,14 @@ const scenarios = demosUnderTest.map((demo) => {
   ] as const;
 });
 
-async function exercise(page: Page, scenario: string): Promise<void> {
+async function exercise(
+  page: Page,
+  demo: Locator,
+  scenario: string,
+): Promise<void> {
   switch (scenario) {
     case "accordion": {
-      const trigger = page.getByRole("button", { name: "Details" });
+      const trigger = demo.getByRole("button", { name: "Details" });
       await expect(trigger).toHaveAttribute("aria-expanded", "true");
       await trigger.click();
       await expect(trigger).toHaveAttribute("aria-expanded", "false");
@@ -56,7 +61,7 @@ async function exercise(page: Page, scenario: string): Promise<void> {
       break;
     }
     case "checkbox": {
-      const control = page.getByRole("checkbox", {
+      const control = demo.getByRole("checkbox", {
         name: "Include archived projects",
       });
       await expect(control).toBeChecked();
@@ -66,8 +71,8 @@ async function exercise(page: Page, scenario: string): Promise<void> {
       break;
     }
     case "radio-group": {
-      const starter = page.getByRole("radio", { name: "Starter" });
-      const pro = page.getByRole("radio", { name: "Pro" });
+      const starter = demo.getByRole("radio", { name: "Starter" });
+      const pro = demo.getByRole("radio", { name: "Pro" });
       await expect(starter).toBeChecked();
       await pro.click();
       await expect(pro).toBeChecked();
@@ -75,7 +80,7 @@ async function exercise(page: Page, scenario: string): Promise<void> {
       break;
     }
     case "switch": {
-      const control = page.getByRole("switch", { name: "Notifications" });
+      const control = demo.getByRole("switch", { name: "Notifications" });
       await expect(control).toBeChecked();
       await control.focus();
       await control.press("Space");
@@ -83,7 +88,7 @@ async function exercise(page: Page, scenario: string): Promise<void> {
       break;
     }
     case "slider": {
-      const control = page.getByRole("slider", { name: "Volume" });
+      const control = demo.getByRole("slider", { name: "Volume" });
       await expect(control).toHaveValue("50");
       await control.focus();
       await control.press("ArrowRight");
@@ -91,15 +96,15 @@ async function exercise(page: Page, scenario: string): Promise<void> {
       break;
     }
     case "select": {
-      const control = page.getByRole("combobox", { name: "Region" });
+      const control = demo.getByRole("combobox", { name: "Region" });
       await expect(control).toHaveValue("eu");
       await control.selectOption("us");
       await expect(control).toHaveValue("us");
       break;
     }
     case "tabs": {
-      const overview = page.getByRole("tab", { name: "Overview" });
-      const activity = page.getByRole("tab", { name: "Activity" });
+      const overview = demo.getByRole("tab", { name: "Overview" });
+      const activity = demo.getByRole("tab", { name: "Activity" });
       await expect(overview).toHaveAttribute("aria-selected", "true");
       await overview.focus();
       await overview.press("ArrowRight");
@@ -112,7 +117,7 @@ async function exercise(page: Page, scenario: string): Promise<void> {
     }
     case "dialog":
     case "drawer": {
-      const trigger = page.getByRole("button", {
+      const trigger = demo.getByRole("button", {
         name: scenario === "dialog" ? "Open dialog" : "Filters",
       });
       await trigger.click();
@@ -127,7 +132,10 @@ async function exercise(page: Page, scenario: string): Promise<void> {
       break;
     }
     case "dropdown-menu": {
-      const trigger = page.getByRole("button", { name: "Actions" });
+      const trigger = demo.getByRole("button", {
+        name: "Actions",
+        exact: true,
+      });
       await trigger.click();
       await expect(page.getByRole("menu")).toBeVisible();
       await expect(
@@ -140,7 +148,7 @@ async function exercise(page: Page, scenario: string): Promise<void> {
       break;
     }
     case "popover": {
-      const trigger = page.getByRole("button", { name: "Details" });
+      const trigger = demo.getByRole("button", { name: "Details" });
       await trigger.click();
       await expect(
         page.getByText("Non-modal details", { exact: true }),
@@ -154,22 +162,24 @@ async function exercise(page: Page, scenario: string): Promise<void> {
       break;
     }
     case "tooltip": {
-      const trigger = page.getByRole("button", { name: "Help" });
+      const trigger = demo.getByRole("button", { name: "Help" });
       await trigger.focus();
       await expect(page.getByRole("tooltip")).toBeVisible();
       break;
     }
     case "toast": {
-      await expect(
-        page.getByRole("list", { name: "Notifications" }),
-      ).toBeVisible();
-      await expect(page.getByText("Saved", { exact: true })).toBeVisible();
-      await page.getByRole("button", { name: "Dismiss" }).click();
-      await expect(page.getByText("Saved", { exact: true })).toBeHidden();
+      const viewport = page.getByRole("list", {
+        name: "Notifications",
+        exact: true,
+      });
+      await expect(viewport).toBeVisible();
+      await expect(viewport.getByText("Saved", { exact: true })).toBeVisible();
+      await viewport.getByRole("button", { name: "Dismiss" }).click();
+      await expect(viewport.getByText("Saved", { exact: true })).toBeHidden();
       break;
     }
     case "toggle": {
-      const control = page.getByRole("button", { name: "Pin project" });
+      const control = demo.getByRole("button", { name: "Pin project" });
       await expect(control).toHaveAttribute("aria-pressed", "true");
       await control.focus();
       await control.press("Space");
@@ -177,8 +187,8 @@ async function exercise(page: Page, scenario: string): Promise<void> {
       break;
     }
     case "toggle-group": {
-      const list = page.getByRole("button", { name: "List" });
-      const grid = page.getByRole("button", { name: "Grid" });
+      const list = demo.getByRole("button", { name: "List" });
+      const grid = demo.getByRole("button", { name: "Grid" });
       await expect(list).toHaveAttribute("aria-pressed", "true");
       await list.focus();
       await list.press("ArrowRight");
@@ -203,7 +213,11 @@ test.describe("catalogue accessibility regression matrix", () => {
       await expect(
         page.locator(`[data-demo-id="${demoId}"] .combric-docs-example`),
       ).toBeVisible();
-      await exercise(page, scenario);
+      await exercise(
+        page,
+        page.locator(`[data-demo-id="${demoId}"]`),
+        scenario,
+      );
       const builder = new AxeBuilder({ page });
       if (["dropdown-menu", "popover", "tooltip", "toast"].includes(scenario)) {
         // Non-modal portals intentionally live outside the docs page landmarks.

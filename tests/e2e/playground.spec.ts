@@ -112,6 +112,30 @@ test("Playground controls reset deterministically and generated text is inert", 
   ).toBeVisible();
 });
 
+test("Playground boolean control aligns its checkbox and label", async ({
+  page,
+}) => {
+  await page.goto("/playground/");
+  const control = page.locator(".combric-playground__boolean-control");
+  const checkbox = page.getByRole("checkbox", { name: "Disabled" });
+  const label = control.locator("span");
+  const checkboxBox = await checkbox.boundingBox();
+  const labelBox = await label.boundingBox();
+
+  expect(checkboxBox).not.toBeNull();
+  expect(labelBox).not.toBeNull();
+  expect(
+    Math.abs(
+      checkboxBox!.y +
+        checkboxBox!.height / 2 -
+        (labelBox!.y + labelBox!.height / 2),
+    ),
+  ).toBeLessThanOrEqual(1);
+  expect(
+    labelBox!.x - (checkboxBox!.x + checkboxBox!.width),
+  ).toBeLessThanOrEqual(10);
+});
+
 test("Playground menu interactions remain keyboard accessible", async ({
   page,
 }) => {

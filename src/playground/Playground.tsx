@@ -93,7 +93,10 @@ export function Playground() {
         {entry.controls.map((control) => {
           if (control.kind === "boolean")
             return (
-              <label key={control.name}>
+              <label
+                className="combric-playground__boolean-control"
+                key={control.name}
+              >
                 <input
                   type="checkbox"
                   checked={Boolean(props[control.name])}
@@ -101,7 +104,7 @@ export function Playground() {
                     update(control.name, event.target.checked)
                   }
                 />{" "}
-                {control.label}
+                <span>{control.label}</span>
               </label>
             );
           if (control.kind === "enum")

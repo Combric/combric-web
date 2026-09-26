@@ -1,11 +1,12 @@
 ---
 title: Borders & Radius
-description: Canonical border and square geometry values.
+description: Canonical border and radius tokens in the published v1.0.0 package.
 ---
 
 import TokenTable from "../../../../components/TokenTable.astro";
 
-Metriq's semantic radius resolves to zero. Borders use explicit canonical width
-and style roles.
+The published `@combric/tokens@1.0.0` semantic radius resolves to zero. Borders
+use explicit canonical width and style roles. This is the current package
+contract; component-specific functional geometry requires a Framework change.
 
 <TokenTable prefix={["border.", "radius"]} />
