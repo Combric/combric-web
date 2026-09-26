@@ -675,7 +675,8 @@ test("theme control supports light, dark, system preference and persistence", as
 test("native search returns versioned documentation and navigates to the result", async ({
   page,
 }) => {
-  await page.goto("/docs/v1.0.0/");
+  await page.goto(docsRoute(currentDocumentationVersion));
+  const guardRoute = `${docsRoute(currentDocumentationVersion, "reference/guard")}/`;
   const searchButton = page.getByRole("button", { name: /search/i }).first();
   await expect(searchButton).toBeVisible();
   await searchButton.click();
@@ -685,16 +686,17 @@ test("native search returns versioned documentation and navigates to the result"
     name: "Search documentation",
   });
   await searchInput.fill("Guard");
-  const result = searchDialog.getByRole("link", { name: /Guard/ }).first();
+  const result = searchDialog.locator(`a[href="${guardRoute}"]`);
   await expect(result).toBeVisible();
-  await expect(result).toHaveAttribute(
-    "href",
-    /\/docs\/v1\.0\.0\/reference\/guard\//,
-  );
+  await expect(result).toHaveAttribute("href", guardRoute);
   await expectNoAxeViolations(page);
   await result.click();
-  await expect(page).toHaveURL(/\/docs\/v1\.0\.0\/reference\/guard\//);
-  await expect(page.getByText("@combric/guard@1.0.0").first()).toBeVisible();
+  await expect(page).toHaveURL(new URL(guardRoute, page.url()).href);
+  await expect(
+    page
+      .getByText(`@combric/guard@${currentDocumentationVersion.packageVersion}`)
+      .first(),
+  ).toBeVisible();
 });
 
 test("dialog keyboard dismissal restores focus", async ({ page }) => {
