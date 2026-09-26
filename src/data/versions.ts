@@ -10,21 +10,39 @@ export type DocumentationVersion = {
   }>[];
 };
 
+const publicPackages = Object.freeze([
+  { name: "@combric/tokens", integration: "native" },
+  { name: "@combric/layout", integration: "native" },
+  { name: "@combric/react", integration: "native" },
+  { name: "@combric/tailwind", integration: "adapter" },
+  { name: "@combric/cli", integration: "tooling" },
+  { name: "@combric/guard", integration: "tooling" },
+] as const);
+
 export const documentationVersions = Object.freeze([
+  {
+    id: "v1.1.1",
+    label: "v1.1.1",
+    status: "current",
+    packageVersion: "1.1.1",
+    contentRoot: "docs/v1.1.1",
+    packages: publicPackages,
+  },
+  {
+    id: "v1.1.0",
+    label: "v1.1.0",
+    status: "previous",
+    packageVersion: "1.1.0",
+    contentRoot: "docs/v1.1.0",
+    packages: publicPackages,
+  },
   {
     id: "v1.0.0",
     label: "v1.0.0",
-    status: "current",
+    status: "previous",
     packageVersion: "1.0.0",
     contentRoot: "docs/v1.0.0",
-    packages: Object.freeze([
-      { name: "@combric/tokens", integration: "native" },
-      { name: "@combric/layout", integration: "native" },
-      { name: "@combric/react", integration: "native" },
-      { name: "@combric/tailwind", integration: "adapter" },
-      { name: "@combric/cli", integration: "tooling" },
-      { name: "@combric/guard", integration: "tooling" },
-    ]),
+    packages: publicPackages,
   },
 ] satisfies readonly DocumentationVersion[]);
 
@@ -40,7 +58,7 @@ export function docsRoute(version: DocumentationVersion | string, path = "") {
 
 export function latestRoute(path = "") {
   const suffix = path.replace(/^\/+|\/+$/g, "");
-  return `/docs/latest${suffix ? `/${suffix}` : "/"}`;
+  return `/docs/latest${suffix ? `/${suffix}/` : "/"}`;
 }
 
 export function equivalentVersionRoute(

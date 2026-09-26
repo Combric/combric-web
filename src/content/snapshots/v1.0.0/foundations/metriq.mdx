@@ -1,14 +1,23 @@
 ---
 title: Metriq
-description: Combric's default square, semantic design language.
+description: Combric's semantic design language and the published v1.0.0 token contract.
 ---
 
-Metriq is Combric's default design language: restrained, editorial, and square.
-Its semantic `radius` resolves to the `radius.square` primitive value `0`.
+Metriq is Combric's default design language: restrained, editorial, and
+technical. In the published `@combric/tokens@1.0.0` contract, the semantic
+`--combric-radius` resolves to the `radius.square` primitive value `0`.
+
+That value describes the current published package, not a requirement that all
+future Metriq controls use square geometry. The Web catalogue preserves the
+published CSS exactly. Button and Card geometry, plus control-specific shapes,
+require Framework token/component support before this site can adopt them
+without consumer overrides.
 
 Primitive tokens hold reusable raw values. Semantic tokens name UI purpose and
 point to primitives. Components consume semantic CSS properties so canonical
 values are defined once without introducing a runtime theme system.
 
 Metriq documents default developer-facing behavior; it is not a brand guideline
-or Theme Builder.
+or Theme Builder. Current published color tokens also remain the source of truth
+for component previews; the documentation chrome maps its own Starlight surfaces
+to the approved Combric Web palette.

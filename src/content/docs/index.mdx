@@ -1,36 +1,53 @@
 ---
 title: Combric
-description: Package-first, native-first UI framework documentation.
+description: Combric is a native CSS-first React UI framework with canonical tokens and an optional Tailwind adapter.
 template: splash
 hero:
-  tagline:
-    A performance-first UI framework built on canonical tokens, standard CSS,
-    native semantics, and React 19.
+  tagline: A native CSS-first React framework built on canonical tokens and accessible browser semantics. Tailwind is optional.
   actions:
-    - text: Get started
+    - text: Read the docs
       link: /docs/latest/getting-started/
       icon: right-arrow
     - text: Browse components
       link: /docs/latest/components/actions/button/
       variant: minimal
+    - text: Open Playground
+      link: /playground/
+      variant: minimal
 ---
 
-<div class="combric-docs-status">
-  <strong>Stable 1.0.0 documentation.</strong> The six public Combric packages
-  are published and consumed here as registry artifacts.
+<div class="combric-home-status" aria-label="Stable framework release">
+  <span class="combric-home-status__marker" aria-hidden="true"></span>
+  <span>Framework stable · 1.1.1</span>
 </div>
 
-## Architecture
+## A focused foundation for interface work
 
-Combric is package-first. Standard CSS is a primary consumer path, React
-components do not require Tailwind, and the Tailwind v4 adapter is optional.
+Combric keeps styling, behavior, and framework integration deliberately
+separate. Build with the browser-native CSS contract, add React components when
+useful, and opt into the Tailwind v4 adapter only when it fits your project.
 
-- `@combric/tokens` — canonical typed tokens and generated CSS properties.
-- `@combric/layout` — framework-independent Grid and Flexbox primitives.
-- `@combric/react` — native-first accessible React components.
-- `@combric/tailwind` — optional semantic Tailwind v4 adapter.
+<div class="combric-home-principles">
+  <article>
+    <h3>Native CSS first</h3>
+    <p>
+      Canonical tokens and layout primitives are available without a utility
+      framework.
+    </p>
+  </article>
+  <article>
+    <h3>React, browser semantics</h3>
+    <p>
+      Components keep native elements and accessible interaction contracts close
+      to the platform.
+    </p>
+  </article>
+  <article>
+    <h3>Tailwind when you choose</h3>
+    <p>An optional adapter maps Combric tokens into Tailwind v4 utilities.</p>
+  </article>
+</div>
 
-## Release state
-
-The component catalogue, CLI, and read-only Guard contracts are part of the
-stable 1.0.0 release. Combric Studio is outside this release.
+The catalogue documents the published package contracts directly. Every preview
+on this site is rendered from the same canonical example source shown beside
+it.

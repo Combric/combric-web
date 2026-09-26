@@ -1,0 +1,19 @@
+---
+title: Metriq
+description: Combric's semantic design language and the published v1.1.1 token contract.
+---
+
+Metriq is Combric's default design language: restrained, editorial, and
+technical. The published `@combric/tokens@1.1.1` package keeps a square general
+`--combric-radius` for structural use and adds role-specific geometry for
+functional components. Button and Card default to `0.25rem`; controls, overlays,
+circles, and pill tracks use their own semantic radius tokens.
+
+Primitive tokens hold reusable raw values. Semantic tokens name UI purpose and
+point to primitives. Components consume semantic CSS properties so canonical
+values are defined once without introducing a runtime theme system.
+
+Metriq documents default developer-facing behavior; it is not a brand guideline
+or Theme Builder. The published semantic palette is the source of truth for
+component previews in both light and dark themes. Documentation chrome remains
+a separate, bounded Starlight mapping layer.

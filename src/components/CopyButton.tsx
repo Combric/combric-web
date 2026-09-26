@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { copyToClipboard } from "../lib/copyToClipboard";
 
 export interface CopyButtonProps {
   readonly text: string;
@@ -10,20 +11,7 @@ export function CopyButton({ text, label = "Copy code" }: CopyButtonProps) {
 
   async function copy() {
     try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const area = document.createElement("textarea");
-        area.value = text;
-        area.setAttribute("readonly", "");
-        area.style.position = "fixed";
-        area.style.opacity = "0";
-        document.body.append(area);
-        area.select();
-        const copied = document.execCommand("copy");
-        area.remove();
-        if (!copied) throw new Error("Copy command was unavailable");
-      }
+      await copyToClipboard(text);
       setStatus("copied");
     } catch {
       setStatus("error");

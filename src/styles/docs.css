@@ -1,30 +1,429 @@
 @import "@combric/react/css";
 
 :root {
-  --sl-color-accent-low: #deded8;
-  --sl-color-accent: var(--combric-color-accent);
-  --sl-color-accent-high: #181816;
   --sl-font: var(--combric-font-family-body);
   --sl-font-mono: var(--combric-font-family-code);
+  --sl-content-width: var(--combric-size-content-prose);
+  --sl-content-pad-x: var(--combric-space-4);
+  --sl-nav-pad-x: var(--combric-space-4);
+  --sl-nav-gap: var(--combric-space-4);
+  --sl-sidebar-pad-x: var(--combric-space-4);
+  --sl-color-accent: #e64a2e;
+}
+
+:root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --sl-color-white: #f2f0ea;
+  --sl-color-gray-1: #f2f0ea;
+  --sl-color-gray-2: #d8d6d0;
+  --sl-color-gray-3: #a4a39d;
+  --sl-color-gray-4: #777771;
+  --sl-color-gray-5: #42433f;
+  --sl-color-gray-6: #202120;
+  --sl-color-black: #151515;
+  --sl-color-accent-low: #30312e;
+  --sl-color-accent-high: #f2f0ea;
+  --sl-color-text-accent: #f2f0ea;
+  --sl-color-text-invert: #151515;
+  --sl-color-bg-accent: #30312e;
+  --sl-color-bg-inline-code: #202120;
+  --sl-color-hairline: #42433f;
+  --sl-color-hairline-light: #42433f;
+  --sl-color-hairline-shade: #151515;
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
+  --sl-color-white: #151515;
+  --sl-color-gray-1: #202120;
+  --sl-color-gray-2: #202120;
+  --sl-color-gray-3: #4e4e49;
+  --sl-color-gray-4: #74736d;
+  --sl-color-gray-5: #aaa8a1;
+  --sl-color-gray-6: #d8d6d0;
+  --sl-color-gray-7: #ffffff;
+  --sl-color-black: #f2f0ea;
+  --sl-color-accent-low: #e5e2dc;
+  --sl-color-accent-high: #151515;
+  --sl-color-text-accent: #151515;
+  --sl-color-text-invert: #f2f0ea;
+  --sl-color-bg-nav: #f2f0ea;
+  --sl-color-bg-sidebar: #f2f0ea;
+  --sl-color-bg-inline-code: #e7e5df;
+  --sl-color-bg-accent: #d8d6d0;
+  --sl-color-hairline: #d8d6d0;
+  --sl-color-hairline-light: #d8d6d0;
+  --sl-color-hairline-shade: #d8d6d0;
 }
 
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --sl-color-accent-low: #172554;
-  --sl-color-accent: #93c5fd;
-  --sl-color-accent-high: #dbeafe;
+.combric-global-nav a:hover,
+.combric-global-nav a:focus-visible,
+.combric-global-nav a[aria-current="page"] {
+  text-decoration: none;
+}
+
+.header .title-wrapper {
+  overflow: visible;
+}
+
+.sl-markdown-content {
+  line-height: var(--combric-line-height-body);
+}
+
+.sl-markdown-content > :is(h2, h3) {
+  scroll-margin-top: calc(var(--sl-nav-height) + var(--combric-space-6));
+}
+
+.sl-markdown-content > h2 {
+  margin-block: var(--combric-space-12) var(--combric-space-3);
+  padding-block-start: var(--combric-space-4);
+  border-block-start: 1px solid var(--sl-color-hairline);
+  letter-spacing: var(--combric-letter-spacing-heading);
+}
+
+.sl-markdown-content > h2:first-child {
+  margin-block-start: var(--combric-space-6);
+  padding-block-start: 0;
+  border: 0;
+}
+
+.sl-markdown-content > h3 {
+  margin-block: var(--combric-space-8) var(--combric-space-2);
+  letter-spacing: var(--combric-letter-spacing-heading);
+}
+
+.sl-markdown-content > :is(p, ul, ol, table) {
+  margin-block: var(--combric-space-3);
+}
+
+.sl-markdown-content a:not([class]) {
+  color: var(--sl-color-text-accent);
+  text-decoration-color: color-mix(in srgb, currentColor 42%, transparent);
+  text-underline-offset: 0.18em;
+}
+
+.sl-markdown-content a:not([class]):hover {
+  text-decoration-color: var(--sl-color-accent);
+}
+
+.sl-link-button {
+  border-radius: 0.25rem;
+}
+
+.sidebar-content {
+  gap: var(--combric-space-2);
+  padding-block-start: var(--combric-space-4);
+}
+
+.sidebar-content a {
+  border-radius: 0.2rem;
+}
+
+.sidebar-content a[aria-current="page"] {
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-text-accent);
+  font-weight: var(--combric-font-weight-emphasis);
+  box-shadow: inset 2px 0 var(--sl-color-accent);
+}
+
+.sidebar-content a:focus-visible,
+.right-sidebar a:focus-visible,
+.global-announce a:focus-visible,
+.combric-demo-actions button:focus-visible {
+  outline: 2px solid var(--sl-color-accent);
+  outline-offset: 2px;
 }
 
 .combric-docs-status {
-  border-inline-start: var(--combric-border-width-strong) solid
-    var(--combric-color-invalid);
+  margin-block: var(--combric-space-6);
+  border-inline-start: 2px solid var(--sl-color-accent);
   padding: var(--combric-space-3) var(--combric-space-4);
-  background: var(--combric-color-surface);
-  color: var(--combric-color-text);
+  background: var(--sl-color-bg-nav);
+  color: var(--sl-color-text);
+}
+
+.combric-home-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--combric-space-2);
+  margin-block: var(--combric-space-6) var(--combric-space-2);
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-sm);
+  font-weight: var(--combric-font-weight-emphasis);
+}
+
+.combric-home-status__marker {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--sl-color-accent);
+}
+
+.combric-home-principles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--combric-space-4);
+  margin-block: var(--combric-space-8);
+}
+
+.combric-home-principles article {
+  min-width: 0;
+  margin: 0;
+  border-block-start: 1px solid var(--sl-color-hairline);
+  padding-block-start: var(--combric-space-3);
+}
+
+.combric-home-principles h3 {
+  margin: 0 0 var(--combric-space-2);
+  font-size: var(--sl-text-h4);
+}
+
+.combric-home-principles p {
+  margin: 0;
+  color: var(--sl-color-gray-3);
+}
+
+.combric-docs-version {
+  margin-block: var(--combric-space-2) var(--combric-space-4);
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-sm);
+}
+
+.combric-docs-import {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.combric-version-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--combric-space-2) var(--combric-space-4);
+  margin-block: var(--combric-space-3);
+  font-size: var(--sl-text-sm);
+}
+
+.combric-version-header > a {
+  white-space: nowrap;
+}
+
+.combric-version-header > label {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--combric-space-2);
+}
+
+.combric-docs-demo {
+  display: grid;
+  min-width: 0;
+  margin-block: var(--combric-space-4);
+  overflow: clip;
+  border: 1px solid var(--sl-color-hairline);
+  background: var(--sl-color-bg);
+}
+
+.combric-docs-demo__title {
+  margin: 0;
+  padding: var(--combric-space-3) var(--combric-space-4);
+  color: var(--sl-color-text);
+  font-size: var(--sl-text-base);
+  font-weight: var(--combric-font-weight-emphasis);
+  line-height: var(--combric-line-height-heading);
+}
+
+.combric-docs-example {
+  display: grid;
+  justify-items: start;
+  min-width: 0;
+  min-height: 6rem;
+  align-content: center;
+  overflow-x: auto;
+  border-block: 1px solid var(--sl-color-hairline);
+  padding: var(--combric-space-6);
+  background: var(--combric-color-canvas, #ffffff);
+  color: var(--combric-color-text, #151515);
+}
+
+.combric-docs-example > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.combric-docs-example
+  astro-island
+  > :is(
+    .combric-alert,
+    .combric-card,
+    .combric-cluster,
+    .combric-container,
+    .combric-description-list,
+    .combric-empty-state,
+    .combric-field,
+    .combric-fieldset,
+    .combric-grid,
+    .combric-input-group,
+    .combric-inline,
+    .combric-skeleton,
+    .combric-stack,
+    .combric-table-container,
+    .grid
+  ) {
+  justify-self: stretch;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.combric-demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--combric-space-2);
+  min-width: 0;
+  padding: var(--combric-space-2) var(--combric-space-3);
+}
+
+.combric-demo-actions__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--combric-space-2);
+}
+
+.combric-demo-actions button {
+  min-height: var(--combric-size-control-sm);
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.25rem;
+  padding-inline: var(--combric-space-3);
+  background: transparent;
+  color: var(--sl-color-text);
+  font: inherit;
+  font-size: var(--sl-text-sm);
+  cursor: pointer;
+}
+
+.combric-demo-actions button:hover {
+  border-color: var(--sl-color-accent);
+}
+
+.combric-demo-actions .combric-demo-actions__copy {
+  border-color: var(--sl-color-white);
+  background: var(--sl-color-white);
+  color: var(--sl-color-black);
+}
+
+.combric-demo-actions .combric-demo-actions__copy:hover {
+  border-color: var(--sl-color-accent);
+  background: var(--sl-color-accent);
+  color: #151515;
+}
+
+.combric-demo-actions__source {
+  flex: 1 0 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: var(--combric-space-2) 0 0;
+  overflow: auto;
+  border: 1px solid var(--sl-color-hairline);
+  padding: var(--combric-space-4);
+  background: #202120;
+  color: #f2f0ea;
+  font-family: var(--combric-font-family-code);
+  font-size: var(--sl-text-code);
+  line-height: 1.55;
+  white-space: pre;
+  tab-size: 2;
+}
+
+.combric-demo-actions__status {
+  flex-basis: 100%;
+  min-height: 1.3em;
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-xs);
+  text-align: end;
+}
+
+.combric-demo-actions__status:empty {
+  display: none;
+}
+
+.combric-style-comparison {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--combric-space-4);
+  min-width: 0;
+}
+
+.combric-style-comparison > * {
+  min-width: 0;
+}
+
+.combric-docs-api,
+.combric-docs-aliases,
+.combric-docs-token-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.combric-docs-api table,
+.combric-docs-aliases table,
+.combric-docs-token-table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.combric-docs-api caption,
+.combric-docs-aliases caption {
+  padding-block: var(--combric-space-2);
+  color: var(--sl-color-text);
+  font-size: var(--sl-text-sm);
+  font-weight: var(--combric-font-weight-emphasis);
+  text-align: start;
+}
+
+.combric-docs-api-contracts th:first-child {
+  width: 35%;
+}
+
+.combric-docs-api th,
+.combric-docs-api td,
+.combric-docs-aliases th,
+.combric-docs-aliases td,
+.combric-docs-token-table th,
+.combric-docs-token-table td {
+  border-bottom: 1px solid var(--sl-color-hairline);
+  padding: var(--combric-space-2) var(--combric-space-3);
+  text-align: start;
+  vertical-align: top;
+}
+
+.combric-docs-api th,
+.combric-docs-aliases th,
+.combric-docs-token-table th {
+  color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-xs);
+  font-weight: var(--combric-font-weight-emphasis);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.combric-docs-token-table {
+  min-width: 44rem;
+}
+
+.combric-docs-swatch {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--sl-color-hairline);
+  vertical-align: middle;
 }
 
 .combric-tool-docs .expressive-code pre {
@@ -33,85 +432,12 @@
 }
 
 .combric-tool-docs .expressive-code .copy .feedback {
-  background-color: #14532d;
+  background-color: #24563b;
   color: #fff;
-}
-
-.combric-docs-example,
-.combric-docs-token-table-wrap {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-.combric-style-comparison {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  gap: var(--combric-space-5);
-}
-
-.combric-style-comparison .surface {
-  border: var(--combric-border-width) solid var(--combric-color-border);
-  background: var(--combric-color-surface);
-  color: var(--combric-color-text);
-  padding: var(--combric-space-4);
-  border-radius: var(--combric-radius);
-}
-
-.combric-docs-example {
-  border: var(--combric-border-width) var(--combric-border-style)
-    var(--combric-color-border);
-  padding: var(--combric-space-4);
-  background: var(--combric-color-canvas);
-  color: var(--combric-color-text);
-}
-
-.combric-docs-source {
-  overflow-x: auto;
-  white-space: pre;
-}
-
-.combric-docs-demo {
-  display: grid;
-  gap: var(--combric-space-3);
-  margin-block: var(--combric-space-6);
-}
-
-.combric-docs-code > summary {
-  cursor: pointer;
-  width: fit-content;
-  color: var(--sl-color-accent);
-}
-
-.combric-docs-token-table {
-  width: 100%;
-  min-width: 44rem;
-  border-collapse: collapse;
-}
-
-.combric-docs-token-table th,
-.combric-docs-token-table td {
-  border-bottom: var(--combric-border-width) solid var(--combric-color-border);
-  padding: var(--combric-space-2) var(--combric-space-3);
-  text-align: left;
-  vertical-align: top;
-}
-
-.combric-docs-swatch {
-  display: inline-block;
-  width: 2rem;
-  height: 2rem;
-  border: var(--combric-border-width) solid var(--combric-color-border);
-  vertical-align: middle;
 }
 
 code {
   overflow-wrap: anywhere;
-}
-
-@media (max-width: 50rem) {
-  .combric-docs-example {
-    padding: var(--combric-space-3);
-  }
 }
 
 .combric-playground {
@@ -126,7 +452,7 @@ code {
 
 .combric-playground__controls {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
   gap: var(--combric-space-3);
   align-items: end;
 }
@@ -134,6 +460,13 @@ code {
 .combric-playground__controls label {
   display: grid;
   gap: var(--combric-space-1);
+}
+
+.combric-playground__controls .combric-playground__boolean-control {
+  display: flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--combric-space-2);
 }
 
 .combric-playground__controls fieldset {
@@ -144,27 +477,58 @@ code {
 }
 
 .combric-playground__stage {
+  min-width: 0;
   overflow: auto;
-  border: var(--combric-border-width) solid var(--combric-color-border);
+  border: 1px solid var(--sl-color-hairline);
   padding: var(--combric-space-3);
-  background: var(--combric-color-surface);
+  background: var(--sl-color-bg-nav);
 }
 
 .combric-playground__stage iframe {
   display: block;
   min-height: 22rem;
   max-width: none;
-  border: var(--combric-border-width) solid var(--combric-color-border);
+  border: 1px solid var(--sl-color-hairline);
   margin-inline: auto;
-  background: var(--combric-color-canvas);
+  background: var(--sl-color-bg);
 }
 
 .combric-playground pre {
-  overflow: auto;
   max-width: 100%;
+  overflow: auto;
+}
+
+@media (max-width: 54rem) {
+  .combric-home-principles {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--combric-space-4);
+  }
+
+  .combric-style-comparison {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 80rem) {
+  .main-frame {
+    --sl-sidebar-width: 12rem;
+    --sl-content-width: 48rem;
+  }
 }
 
 @media (max-width: 50rem) {
+  html .right-group {
+    display: flex;
+  }
+
+  .right-group .social-icons {
+    display: none;
+  }
+
+  .combric-docs-example {
+    padding: var(--combric-space-4);
+  }
+
   .combric-playground__controls {
     grid-template-columns: minmax(0, 1fr);
   }

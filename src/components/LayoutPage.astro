@@ -1,66 +1,119 @@
 ---
 import { layouts, layoutRoute, sourceUrl } from "../data/catalogue";
-import { currentDocumentationVersion } from "../data/versions";
+import { documentationVersions } from "../data/versions";
 import { layoutDemosFor } from "../examples/catalogue-examples";
-import { ExampleRenderer } from "../examples/ExampleRenderer";
-import { CopyButton } from "./CopyButton";
+import CatalogueDemo from "./CatalogueDemo.astro";
+
+type Section =
+  | "intro"
+  | "usage"
+  | "examples"
+  | "api"
+  | "accessibility"
+  | "source";
 
 interface Props {
   slug: string;
+  section: Section;
 }
-const { slug } = Astro.props;
+
+const { slug, section } = Astro.props;
 const item = layouts.find((candidate) => candidate.slug === slug);
 if (!item) throw new Error(`Unknown layout slug: ${slug}`);
-const demos = layoutDemosFor(currentDocumentationVersion.id, slug);
+const version = Astro.url.pathname.match(/^\/docs\/(v\d+\.\d+\.\d+)\//)?.[1];
+const documentationVersion = documentationVersions.find(
+  (candidate) => candidate.id === version,
+);
+if (!documentationVersion)
+  throw new Error(
+    `Layout page is not under a registered version: ${Astro.url.pathname}`,
+  );
+const demos = layoutDemosFor(documentationVersion.id, slug);
 if (!demos.length) throw new Error(`Missing layout example: ${slug}`);
+const importCode = `import { ${item.publicExports.join(", ")} } from "@combric/react";`;
 ---
 
-<p class="combric-docs-version">
-  Documentation:{" "}
-  <a href={layoutRoute(currentDocumentationVersion, item)}>
-    {currentDocumentationVersion.label} — Current
-  </a>
-</p>
+{section === "intro" && (
+  <>
+    <p class="combric-docs-summary">{item.summary}</p>
+    <p class="combric-docs-version">
+      <a href={layoutRoute(documentationVersion, item)}>
+        @combric/layout · {documentationVersion.label} ·{" "}
+        {documentationVersion.status === "current" ? "Current" : "Previous"}
+      </a>
+    </p>
+  </>
+)}
 
-<p>{item.summary}</p>
-<p>
-  The framework-independent CSS contract is available from{" "}
-  <code>@combric/layout/css</code>; the React wrapper is exported by{" "}
-  <code>@combric/react</code>.
-</p>
+{section === "usage" && (
+  <>
+    <pre
+      class="combric-docs-import"
+      tabindex="0"
+    ><code>{importCode}</code></pre>
+    <p>
+      The framework-independent CSS contract is available from
+      <code>@combric/layout/css</code>; the React wrapper comes from
+      <code>@combric/react</code>.
+    </p>
+  </>
+)}
 
-<h2>Example</h2>
-{demos.map((demo) => (
-  <section class="combric-docs-demo" data-demo-id={demo.id}>
-    <h3>{demo.title}</h3>
-    <div class="combric-docs-example">
-      <ExampleRenderer demoId={demo.id} client:load />
-    </div>
-    <details class="combric-docs-code">
-      <summary>View Code</summary>
-      <pre
-        class="combric-docs-source"
-        tabindex="0"
-      ><code>{demo.source}</code></pre>
-    </details>
-    <CopyButton text={demo.source} label="Copy Code" client:load />
-  </section>
-))}
+{section === "examples" && (
+  <>
+    {demos.map((demo) => (
+      <CatalogueDemo demo={demo} />
+    ))}
+  </>
+)}
 
-<h2>API</h2>
-<ul>
-  {item.api.map((contract) => (
-    <li>{contract}</li>
-  ))}
-</ul>
+{section === "api" && (
+  <div class="combric-docs-api">
+    <table>
+      <caption>Public exports</caption>
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        {item.publicExports.map((name) => (
+          <tr>
+            <td>
+              <code>{name}</code>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <table>
+      <caption>Documented contracts</caption>
+      <thead>
+        <tr>
+          <th scope="col">Contract</th>
+        </tr>
+      </thead>
+      <tbody>
+        {item.api.map((contract) => (
+          <tr>
+            <td>{contract}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
 
-<h2>Accessibility</h2>
-<p>
-  Layout changes presentation only. Choose semantic elements and preserve
-  meaningful source order; Combric does not add ARIA, reorder content, or
-  measure the viewport.
-</p>
+{section === "accessibility" && (
+  <p>
+    Layout changes presentation only. Choose semantic elements and preserve
+    meaningful source order; Combric does not add ARIA, reorder content, or
+    measure the viewport.
+  </p>
+)}
 
-<p>
-  <a href={sourceUrl(item.source)}>View React wrapper source on GitHub</a>
-</p>
+{section === "source" && (
+  <p>
+    <a href={sourceUrl(item.source)}>View React wrapper source on GitHub</a>
+  </p>
+)}

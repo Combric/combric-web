@@ -1,0 +1,197 @@
+---
+import logo from "../assets/brand/combric-logo.png";
+import {
+  currentDocumentationVersion,
+  docsRoute,
+  latestRoute,
+} from "../data/versions";
+
+const pathname = Astro.url.pathname;
+const onComponentsPage = pathname.includes("/components/");
+const onPlaygroundPage = pathname.startsWith("/playground/");
+const latestDocsRoute = latestRoute();
+const currentDocsRoute = docsRoute(currentDocumentationVersion);
+const latestComponentsRoute = latestRoute("components/actions/button");
+const onDocsLanding =
+  pathname === latestDocsRoute || pathname === currentDocsRoute;
+---
+
+<div class="combric-site-brand">
+  <a class="combric-site-title" href="/" aria-label="Combric home">
+    <img
+      src={logo.src}
+      alt="Combric mark"
+      width={logo.width}
+      height={logo.height}
+    />
+    <span translate="no">Combric</span>
+  </a>
+  <nav class="combric-global-nav" aria-label="Main navigation">
+    <a href={latestDocsRoute} aria-current={onDocsLanding ? "page" : undefined}>
+      Docs
+    </a>
+    <a
+      href={latestComponentsRoute}
+      aria-current={onComponentsPage ? "page" : undefined}
+    >
+      Components
+    </a>
+    <a href="/playground/" aria-current={onPlaygroundPage ? "page" : undefined}>
+      Playground
+    </a>
+  </nav>
+  <details class="combric-mobile-nav">
+    <summary>Explore</summary>
+    <nav aria-label="Main navigation">
+      <a
+        href={latestDocsRoute}
+        aria-current={onDocsLanding ? "page" : undefined}
+      >
+        Docs
+      </a>
+      <a
+        href={latestComponentsRoute}
+        aria-current={onComponentsPage ? "page" : undefined}
+      >
+        Components
+      </a>
+      <a
+        href="/playground/"
+        aria-current={onPlaygroundPage ? "page" : undefined}
+      >
+        Playground
+      </a>
+      <a href="https://github.com/Combric/combric">GitHub</a>
+    </nav>
+  </details>
+</div>
+
+<style>
+  .combric-site-brand {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: var(--combric-space-6);
+  }
+
+  .combric-site-title {
+    display: inline-flex;
+    min-width: max-content;
+    align-items: center;
+    gap: var(--combric-space-2);
+    color: var(--sl-color-white);
+    font-size: var(--sl-text-h4);
+    font-weight: 650;
+    letter-spacing: var(--combric-letter-spacing-heading);
+    text-decoration: none;
+  }
+
+  .combric-site-title img {
+    display: block;
+    width: auto;
+    height: calc(var(--sl-nav-height) - 1.25rem);
+    object-fit: contain;
+  }
+
+  .combric-global-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--combric-space-4);
+    white-space: nowrap;
+  }
+
+  .combric-mobile-nav {
+    display: none;
+  }
+
+  .combric-global-nav a {
+    position: relative;
+    padding-block: var(--combric-space-2);
+    color: var(--sl-color-text);
+    font-size: var(--sl-text-sm);
+    font-weight: 550;
+    text-decoration: none;
+  }
+
+  .combric-global-nav a:hover,
+  .combric-global-nav a:focus-visible,
+  .combric-global-nav a[aria-current="page"] {
+    color: var(--sl-color-white);
+  }
+
+  .combric-global-nav a[aria-current="page"]::after {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: 2px;
+    background: var(--sl-color-accent);
+    content: "";
+  }
+
+  .combric-global-nav a:focus-visible,
+  .combric-site-title:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 50rem) {
+    .combric-site-brand {
+      gap: var(--combric-space-2);
+    }
+
+    .combric-site-title span {
+      display: none;
+    }
+
+    .combric-global-nav {
+      display: none;
+    }
+
+    .combric-mobile-nav {
+      position: relative;
+      display: block;
+    }
+
+    .combric-mobile-nav summary {
+      padding: var(--combric-space-2);
+      color: var(--sl-color-text);
+      font-size: var(--sl-text-sm);
+      cursor: pointer;
+    }
+
+    .combric-mobile-nav summary:focus-visible,
+    .combric-mobile-nav a:focus-visible {
+      outline: 2px solid var(--sl-color-accent);
+      outline-offset: 2px;
+    }
+
+    .combric-mobile-nav nav {
+      position: absolute;
+      z-index: 10;
+      inset-block-start: calc(100% + var(--combric-space-2));
+      inset-inline-start: 0;
+      display: grid;
+      min-width: 12rem;
+      gap: var(--combric-space-1);
+      border: 1px solid var(--sl-color-hairline);
+      border-radius: 0.25rem;
+      padding: var(--combric-space-2);
+      background: var(--sl-color-bg-nav);
+      box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 18%);
+    }
+
+    .combric-mobile-nav nav a {
+      border-radius: 0.2rem;
+      padding: var(--combric-space-2) var(--combric-space-3);
+      color: var(--sl-color-text);
+      font-size: var(--sl-text-sm);
+      text-decoration: none;
+    }
+
+    .combric-mobile-nav nav a:hover,
+    .combric-mobile-nav nav a[aria-current="page"] {
+      background: var(--sl-color-accent-low);
+      color: var(--sl-color-white);
+    }
+  }
+</style>
