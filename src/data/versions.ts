@@ -23,7 +23,7 @@ export const documentationVersions = Object.freeze([
   {
     id: "v1.2.0",
     label: "v1.2.0",
-    status: "candidate",
+    status: "current",
     packageVersion: "1.2.0",
     contentRoot: "docs/v1.2.0",
     packages: publicPackages,
@@ -31,7 +31,7 @@ export const documentationVersions = Object.freeze([
   {
     id: "v1.1.1",
     label: "v1.1.1",
-    status: "current",
+    status: "previous",
     packageVersion: "1.1.1",
     contentRoot: "docs/v1.1.1",
     packages: publicPackages,
@@ -52,7 +52,7 @@ export const documentationVersions = Object.freeze([
     contentRoot: "docs/v1.0.0",
     packages: publicPackages,
   },
-] satisfies readonly DocumentationVersion[]);
+] as readonly DocumentationVersion[]);
 
 export const currentDocumentationVersion = documentationVersions.find(
   (version) => version.status === "current",
