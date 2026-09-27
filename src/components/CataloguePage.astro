@@ -57,7 +57,11 @@ const apiContracts = catalogueApiForVersion(item, version).map((contract) => {
     <p class="combric-docs-version">
       <a href={catalogueRoute(documentationVersion, item)}>
         {item.package} · {documentationVersion.label} ·{" "}
-        {documentationVersion.status === "current" ? "Current" : "Previous"}
+        {documentationVersion.status === "candidate"
+          ? "Unpublished candidate"
+          : documentationVersion.status === "current"
+            ? "Current"
+            : "Previous"}
       </a>
     </p>
   </>

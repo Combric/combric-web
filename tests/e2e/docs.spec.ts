@@ -855,13 +855,13 @@ test("Docs navigation resolves the latest index to the registry current overview
     currentOverview,
   );
   await expect(page.locator("main h1").first()).toHaveText(
-    `Combric ${currentDocumentationVersion.label}`,
+    "Combric v1.2.0 Motion & Animation System",
   );
   await expect(page).toHaveTitle(
     new RegExp(currentDocumentationVersion.label.replaceAll(".", "\\.")),
   );
   const gettingStartedLink = page.locator(
-    `main a[href="${latestRoute("getting-started")}"]`,
+    `main a[href="${docsRoute(currentDocumentationVersion, "getting-started")}"]`,
   );
   await expect(gettingStartedLink).toBeVisible();
   await gettingStartedLink.click();
@@ -1006,7 +1006,7 @@ test("CLI and Guard documentation matches the published v1.0.0 contracts", async
   await expectNoAxeViolations(page);
 });
 
-test("current CLI and Guard documentation matches the published 1.1.1 contracts", async ({
+test("current CLI and Guard documentation matches the published 1.2.0 contracts", async ({
   page,
 }) => {
   await page.goto(
@@ -1019,16 +1019,18 @@ test("current CLI and Guard documentation matches the published 1.1.1 contracts"
     }),
   ).toBeVisible();
   await expect(
-    page.getByText("@combric/cli@1.1.1", { exact: true }).first(),
+    page.getByText("@combric/cli@1.2.0", { exact: true }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("published", { exact: false }).first(),
+    page
+      .locator(".combric-tool-docs p")
+      .filter({ hasText: "releases published" }),
   ).toBeVisible();
   await expectNoAxeViolations(page);
 
   await page.goto(docsRoute(currentDocumentationVersion, "reference/guard"));
   await expect(
-    page.getByText("@combric/guard@1.1.1", { exact: true }).first(),
+    page.getByText("@combric/guard@1.2.0", { exact: true }).first(),
   ).toBeVisible();
   await expect(
     page.getByText("GUARD_SCAN_SKIPPED", { exact: true }),

@@ -109,7 +109,11 @@ const frontmatter = {
                 selected={option.id === version.id}
               >
                 {option.label} —{" "}
-                {option.status === "current" ? "Current" : "Previous"}
+                {option.status === "candidate"
+                  ? "Unpublished candidate"
+                  : option.status === "current"
+                    ? "Current"
+                    : "Previous"}
               </option>
             ))}
           </select>

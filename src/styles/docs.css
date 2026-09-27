@@ -62,6 +62,93 @@
   text-decoration: none;
 }
 
+.combric-motion-demo {
+  display: grid;
+  gap: var(--combric-space-4);
+  margin-block: var(--combric-space-6);
+  padding: var(--combric-space-4);
+  border: var(--combric-border-width) var(--combric-border-style)
+    var(--combric-color-border);
+  border-radius: var(--combric-radius-surface);
+  background: var(--combric-color-canvas);
+}
+
+.combric-motion-demo__modes,
+.combric-motion-demo__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--combric-space-2);
+}
+
+.combric-motion-demo__modes button {
+  border: var(--combric-border-width) var(--combric-border-style)
+    var(--combric-color-border);
+  border-radius: var(--combric-radius-control);
+  padding: var(--combric-space-2) var(--combric-space-3);
+  color: var(--combric-color-text);
+  background: var(--combric-color-surface);
+  font: inherit;
+  cursor: pointer;
+}
+
+.combric-motion-demo__modes button[aria-pressed="true"] {
+  border-color: var(--combric-color-accent);
+  outline: 2px solid var(--combric-color-accent);
+  outline-offset: 2px;
+}
+
+.combric-motion-demo__description {
+  margin: 0;
+  color: var(--combric-color-text-muted);
+}
+
+html[data-combric-motion-preview="custom"] .combric-motion-demo__menu {
+  transition:
+    opacity 450ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html[data-combric-motion-preview="custom"]
+  .combric-motion-demo__menu[data-presence="entering"],
+html[data-combric-motion-preview="custom"]
+  .combric-motion-demo__menu[data-state="closed"] {
+  opacity: 0;
+  transform: translateY(0.75rem) rotateX(-6deg);
+}
+
+html[data-combric-motion-preview="custom"]
+  .combric-motion-demo__menu[data-state="open"][data-presence="entered"] {
+  opacity: 1;
+  transform: none;
+}
+
+html[data-combric-motion-preview="custom"] .combric-motion-demo__drawer {
+  transition:
+    opacity 450ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html[data-combric-motion-preview="custom"]
+  .combric-motion-demo__drawer[data-side="right"][data-presence="entering"],
+html[data-combric-motion-preview="custom"]
+  .combric-motion-demo__drawer[data-side="right"][data-state="closed"] {
+  opacity: 0;
+  transform: translateX(2rem) rotate(1deg);
+}
+
+html[data-combric-motion-preview="custom"]
+  .combric-motion-demo__drawer[data-side="right"][data-state="open"][data-presence="entered"] {
+  opacity: 1;
+  transform: translateX(0) rotate(0);
+}
+
+html[data-combric-motion-preview="reduced"] .combric-motion-demo__menu,
+html[data-combric-motion-preview="reduced"] .combric-motion-demo__drawer {
+  transition: none !important;
+  animation: none !important;
+}
+
 .header .title-wrapper {
   overflow: visible;
 }
