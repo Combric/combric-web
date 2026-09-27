@@ -4,6 +4,9 @@ const previewPort = Number(process.env.COMBRIC_WEB_E2E_PORT ?? "4337");
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  testIgnore: process.env.COMBRIC_CANDIDATE_VERSION
+    ? []
+    : ["tests/e2e/motion-foundation.spec.ts"],
   fullyParallel: false,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? "github" : "list",

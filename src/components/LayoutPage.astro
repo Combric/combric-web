@@ -39,7 +39,11 @@ const importCode = `import { ${item.publicExports.join(", ")} } from "@combric/r
     <p class="combric-docs-version">
       <a href={layoutRoute(documentationVersion, item)}>
         @combric/layout · {documentationVersion.label} ·{" "}
-        {documentationVersion.status === "current" ? "Current" : "Previous"}
+        {documentationVersion.status === "candidate"
+          ? "Unpublished candidate"
+          : documentationVersion.status === "current"
+            ? "Current"
+            : "Previous"}
       </a>
     </p>
   </>

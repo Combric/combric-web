@@ -1022,7 +1022,9 @@ test("current CLI and Guard documentation matches the published 1.1.1 contracts"
     page.getByText("@combric/cli@1.1.1", { exact: true }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("published", { exact: false }).first(),
+    page
+      .locator(".combric-tool-docs p")
+      .filter({ hasText: "releases published" }),
   ).toBeVisible();
   await expectNoAxeViolations(page);
 

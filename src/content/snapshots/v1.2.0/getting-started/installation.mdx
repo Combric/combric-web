@@ -1,0 +1,39 @@
+---
+title: Installation
+description: Install the published Combric 1.1.1 packages.
+---
+
+This is an unpublished `v1.2.0` candidate documentation snapshot. The public
+Combric packages currently available on npm remain synchronized at stable
+version `1.1.1`; the commands below intentionally install that published
+baseline. Do not use a `1.2.0` registry specifier before the separate
+publication approval.
+
+## React components
+
+```sh
+npm install @combric/react@1.1.1 react@^19 react-dom@^19
+```
+
+React and React DOM `>=19.0.0 <20` are peer dependencies.
+
+## Tokens only
+
+```sh
+npm install @combric/tokens@1.1.1
+```
+
+## Framework-independent layout
+
+```sh
+npm install @combric/layout@1.1.1
+```
+
+## Optional Tailwind adapter
+
+```sh
+npm install @combric/tailwind@1.1.1 tailwindcss
+```
+
+Tailwind CSS must satisfy `>=4.3.0 <5`. Combric does not require the CLI,
+Tailwind, or source-copy installation.

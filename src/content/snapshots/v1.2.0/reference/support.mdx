@@ -1,0 +1,38 @@
+---
+title: Support & Versioning
+description: Stable public compatibility and Semantic Versioning policy.
+---
+
+Combric's six public packages use one synchronized version and follow Semantic
+Versioning. The current stable public release is `1.1.1`.
+
+All six `1.1.1` packages are published on npm. The repository's release-quality
+check verifies their availability by installing them from the public registry
+in an isolated consumer fixture. This check confirms package consumption; it is
+not publication authority and does not publish or modify framework packages.
+
+## Public compatibility contract
+
+The stable contract includes exported JavaScript and TypeScript APIs, exported
+types, React component props, public package and CSS entry points, documented
+CSS classes and custom properties, CLI commands/options/documented behavior, the
+Guard API, stable `GUARD_*` rule IDs, and Guard JSON schema 1.
+
+Removing or incompatibly changing one of these surfaces requires a major
+version. Compatible additions use a minor version and compatible fixes use a
+patch version. Private helpers, internal source layout, tests, build scripts,
+and undocumented implementation details are not public compatibility surfaces.
+
+## Supported peers and environments
+
+- React and React DOM: `>=19.0.0 <20`.
+- Optional Tailwind CSS adapter: `>=4.3.0 <5`.
+- CLI and Guard: Node.js 24 or newer.
+- CSS: modern browsers with the native features used by the documented component
+  and layout contracts.
+
+Documentation is canonical under `/docs/v1.1.1/`. `/docs/latest/` resolves to
+the current stable snapshot without duplicating content. Future releases will
+add immutable sibling snapshots such as `/docs/v1.1.1/`; older snapshots will
+remain available and will not be rewritten. No migration guides are claimed
+until they exist.

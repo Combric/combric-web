@@ -1,7 +1,7 @@
 export type DocumentationVersion = {
   id: `v${number}.${number}.${number}`;
   label: string;
-  status: "current" | "previous";
+  status: "candidate" | "current" | "previous";
   packageVersion: string;
   contentRoot: string;
   packages: readonly Readonly<{
@@ -20,6 +20,14 @@ const publicPackages = Object.freeze([
 ] as const);
 
 export const documentationVersions = Object.freeze([
+  {
+    id: "v1.2.0",
+    label: "v1.2.0",
+    status: "candidate",
+    packageVersion: "1.2.0",
+    contentRoot: "docs/v1.2.0",
+    packages: publicPackages,
+  },
   {
     id: "v1.1.1",
     label: "v1.1.1",
