@@ -107,10 +107,6 @@ export default defineConfig({
             },
             { label: "Focus", link: docs("foundations/focus") },
             { label: "Animation", link: docs("foundations/motion") },
-            {
-              label: "Motion 1.2.0 candidate",
-              link: docsRoute("v1.2.0", "foundations/motion"),
-            },
             { label: "Layers", link: docs("foundations/layers") },
             { label: "Token API", link: docs("foundations/token-api") },
           ],
