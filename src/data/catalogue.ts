@@ -76,6 +76,13 @@ export const catalogue = Object.freeze([
         "radius: none | sm | md | lg | full",
         "type defaults to button",
       ],
+      "v1.3.0": [
+        "variant: primary | secondary | ghost | accent | danger",
+        "size: sm | md | lg",
+        "radius: none | sm | md | lg | full",
+        "type defaults to button",
+        "leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
     },
     accessibility:
       "Retains native button semantics, disabled behavior, and consumer-provided accessible naming.",
@@ -90,6 +97,14 @@ export const catalogue = Object.freeze([
     publicExports: ["Toggle"],
     summary: "Pressable tool-state button using aria-pressed.",
     api: ["pressed/defaultPressed", "onPressedChange", "native button props"],
+    apiByVersion: {
+      "v1.3.0": [
+        "pressed/defaultPressed",
+        "onPressedChange",
+        "native button props",
+        "leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Uses a native button and exposes pressed state through aria-pressed.",
     keyboard: "Native Enter and Space activation.",
@@ -107,6 +122,14 @@ export const catalogue = Object.freeze([
       "value/defaultValue",
       "orientation: horizontal | vertical",
     ],
+    apiByVersion: {
+      "v1.3.0": [
+        "type: single | multiple",
+        "value/defaultValue",
+        "orientation: horizontal | vertical",
+        "ToggleGroupItem leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Groups toggle buttons without replacing native radio semantics when a form value is required.",
     keyboard:
@@ -121,6 +144,13 @@ export const catalogue = Object.freeze([
     publicExports: ["Label"],
     summary: "Styled native label for explicit or wrapping association.",
     api: ["All native label props", "htmlFor"],
+    apiByVersion: {
+      "v1.3.0": [
+        "All native label props",
+        "htmlFor",
+        "leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Preserves native label association; consumers must supply visible, meaningful text.",
     source: "packages/react/src/form-controls.tsx",
@@ -235,6 +265,13 @@ export const catalogue = Object.freeze([
     publicExports: ["Fieldset", "FieldLegend"],
     summary: "Styled native fieldset and legend composition.",
     api: ["Native fieldset and legend props", "disabled propagation"],
+    apiByVersion: {
+      "v1.3.0": [
+        "Native fieldset and legend props",
+        "disabled propagation",
+        "FieldLegend leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility: "Preserves native grouping, naming, and disabled semantics.",
     source: "packages/react/src/field.tsx",
     playground: false,
@@ -267,6 +304,14 @@ export const catalogue = Object.freeze([
     summary:
       "Labelled breadcrumb navigation with native links and ordered structure.",
     api: ["Native nav/list/link props", "BreadcrumbPage supplies aria-current"],
+    apiByVersion: {
+      "v1.3.0": [
+        "Native nav/list/link props",
+        "BreadcrumbPage supplies aria-current",
+        "BreadcrumbLink/BreadcrumbPage leadingIcon/trailingIcon: ReactNode decorative slots",
+        "BreadcrumbSeparator icon: ReactNode decorative slot",
+      ],
+    },
     accessibility:
       "Uses a labelled nav, ordered list, presentational separators, and aria-current for the current page.",
     source: "packages/react/src/breadcrumb.tsx",
@@ -286,6 +331,16 @@ export const catalogue = Object.freeze([
     ],
     summary: "Native link-based pagination structure without data ownership.",
     api: ["current", "disabled", "native anchor props"],
+    apiByVersion: {
+      "v1.3.0": [
+        "current",
+        "disabled",
+        "native anchor props",
+        "PaginationLink leadingIcon/trailingIcon: ReactNode decorative slots",
+        "PaginationPrevious icon: ReactNode leading decorative slot",
+        "PaginationNext icon: ReactNode trailing decorative slot",
+      ],
+    },
     accessibility:
       "Current links use aria-current; disabled links lose href and leave the tab order.",
     source: "packages/react/src/pagination.tsx",
@@ -298,6 +353,14 @@ export const catalogue = Object.freeze([
     publicExports: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
     summary: "Single-selection tabs with automatic horizontal activation.",
     api: ["value/defaultValue", "onValueChange", "disabled triggers"],
+    apiByVersion: {
+      "v1.3.0": [
+        "value/defaultValue",
+        "onValueChange",
+        "disabled triggers",
+        "TabsTrigger leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Stable IDs connect tab, tablist, and tabpanel roles and state.",
     keyboard:
@@ -326,6 +389,13 @@ export const catalogue = Object.freeze([
     summary:
       "Non-interactive compact label with neutral or accent presentation.",
     api: ["variant: neutral | accent", "native span props"],
+    apiByVersion: {
+      "v1.3.0": [
+        "variant: neutral | accent",
+        "native span props",
+        "leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Renders a non-interactive span; status announcements remain consumer-owned.",
     source: "packages/react/src/display.tsx",
@@ -354,6 +424,13 @@ export const catalogue = Object.freeze([
         "radius: none | sm | md | lg | full",
         "Native props for each rendered element",
         "compositional subcomponents",
+      ],
+      "v1.3.0": [
+        "tone: surface | muted | elevated",
+        "radius: none | sm | md | lg | full",
+        "Native props for each rendered element",
+        "compositional subcomponents",
+        "CardTitle icon: ReactNode decorative slot",
       ],
     },
     accessibility:
@@ -421,6 +498,14 @@ export const catalogue = Object.freeze([
     summary:
       "Single-open disclosure family with controlled and uncontrolled state.",
     api: ["value/defaultValue", "onValueChange", "disabled items"],
+    apiByVersion: {
+      "v1.3.0": [
+        "value/defaultValue",
+        "onValueChange",
+        "disabled items",
+        "AccordionTrigger leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Native buttons and stable IDs connect expanded state, controls, and labelled regions.",
     keyboard: "Native button Enter and Space behavior.",
@@ -434,6 +519,14 @@ export const catalogue = Object.freeze([
     publicExports: ["Collapsible", "CollapsibleTrigger", "CollapsibleContent"],
     summary: "Single disclosure with controlled or uncontrolled open state.",
     api: ["open/defaultOpen", "onOpenChange", "disabled"],
+    apiByVersion: {
+      "v1.3.0": [
+        "open/defaultOpen",
+        "onOpenChange",
+        "disabled",
+        "CollapsibleTrigger leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Stable aria-expanded and aria-controls relationships connect the native trigger to its region.",
     keyboard: "Native button Enter and Space behavior.",
@@ -455,6 +548,15 @@ export const catalogue = Object.freeze([
     summary:
       "Modal dialog with portal, background isolation, focus management, and dismissal.",
     api: ["open/defaultOpen", "onOpenChange", "container portal target"],
+    apiByVersion: {
+      "v1.3.0": [
+        "open/defaultOpen",
+        "onOpenChange",
+        "container portal target",
+        "DialogTrigger/DialogClose leadingIcon/trailingIcon: ReactNode decorative slots",
+        "DialogTitle icon: ReactNode decorative slot",
+      ],
+    },
     accessibility:
       "Moves focus inside, cycles Tab, isolates background siblings, restores focus, and requires an accessible name.",
     keyboard:
@@ -493,6 +595,15 @@ export const catalogue = Object.freeze([
       "side: left | right",
       "Dialog-compatible open state and portal contract",
     ],
+    apiByVersion: {
+      "v1.3.0": [
+        "side: left | right",
+        "Dialog-compatible open state and portal contract",
+        "DrawerTrigger/DrawerClose leadingIcon/trailingIcon: ReactNode decorative slots",
+        "DrawerTitle icon: ReactNode decorative slot",
+        "SheetTrigger/SheetClose/SheetTitle inherit the exact Drawer contracts",
+      ],
+    },
     accessibility:
       "Reuses Dialog modal isolation, focus trap, dismissal, naming, and restoration behavior.",
     keyboard: "Tab/Shift+Tab cycle; Escape closes and restores trigger focus.",
@@ -516,6 +627,14 @@ export const catalogue = Object.freeze([
       "align: start | center | end",
       "onSelect",
     ],
+    apiByVersion: {
+      "v1.3.0": [
+        "side: top | right | bottom | left",
+        "align: start | center | end",
+        "onSelect",
+        "DropdownMenuTrigger/DropdownMenuItem leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Implements menu/menuitem roles, skips disabled items, and restores focus after keyboard dismissal.",
     keyboard:
@@ -530,6 +649,14 @@ export const catalogue = Object.freeze([
     publicExports: ["Popover", "PopoverTrigger", "PopoverContent"],
     summary: "Non-modal portaled anchored content.",
     api: ["open/defaultOpen", "side", "align"],
+    apiByVersion: {
+      "v1.3.0": [
+        "open/defaultOpen",
+        "side",
+        "align",
+        "PopoverTrigger leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Does not trap focus or isolate background content; consumers supply appropriate content semantics.",
     keyboard:
@@ -544,6 +671,14 @@ export const catalogue = Object.freeze([
     publicExports: ["Tooltip", "TooltipTrigger", "TooltipContent"],
     summary: "Immediate non-interactive description on hover or focus.",
     api: ["side", "align", "open/defaultOpen"],
+    apiByVersion: {
+      "v1.3.0": [
+        "side",
+        "align",
+        "open/defaultOpen",
+        "TooltipTrigger leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Uses role tooltip and aria-describedby, never moves focus, and requires non-interactive content.",
     keyboard: "Focus opens; blur or Escape closes.",
@@ -557,6 +692,13 @@ export const catalogue = Object.freeze([
     publicExports: ["Alert", "AlertTitle", "AlertDescription"],
     summary: "Static feedback section with explicit live-region opt-in.",
     api: ["tone: neutral | error", "live: polite | assertive"],
+    apiByVersion: {
+      "v1.3.0": [
+        "tone: neutral | error",
+        "live: polite | assertive",
+        "AlertTitle icon: ReactNode decorative slot",
+      ],
+    },
     accessibility:
       "Static by default; live semantics are added only when explicitly requested.",
     source: "packages/react/src/feedback.tsx",
@@ -579,6 +721,15 @@ export const catalogue = Object.freeze([
       "duration (0 disables)",
       "priority: polite | assertive",
     ],
+    apiByVersion: {
+      "v1.3.0": [
+        "open/defaultOpen",
+        "duration (0 disables)",
+        "priority: polite | assertive",
+        "ToastTitle icon: ReactNode decorative slot",
+        "ToastClose leadingIcon/trailingIcon: ReactNode decorative slots",
+      ],
+    },
     accessibility:
       "Uses status or alert semantics by priority, provides an accessible close action, and never moves focus.",
     keyboard:
@@ -638,6 +789,14 @@ export const catalogue = Object.freeze([
       "title level: 2 through 6",
       "compositional media/description/actions",
     ],
+    apiByVersion: {
+      "v1.3.0": [
+        "title level: 2 through 6",
+        "compositional media/description/actions",
+        "EmptyStateMedia icon: ReactNode decorative slot",
+        "EmptyStateTitle icon: ReactNode decorative slot",
+      ],
+    },
     accessibility:
       "Selectable heading level lets consumers preserve their document outline; application state remains external.",
     source: "packages/react/src/feedback.tsx",

@@ -138,8 +138,13 @@ const required = [
   currentSnapshotRelative("foundations/colors.mdx"),
   currentSnapshotRelative("getting-started/cli.mdx"),
   currentSnapshotRelative("getting-started/installation.mdx"),
+  currentSnapshotRelative("icons/index.mdx"),
+  currentSnapshotRelative("icons/regular.mdx"),
+  currentSnapshotRelative("icons/solid.mdx"),
   currentSnapshotRelative("reference/packages.mdx"),
   currentSnapshotRelative("reference/guard.mdx"),
+  "src/components/IconsCatalogue.tsx",
+  "src/styles/icons-catalogue.css",
   "src/styles/tailwind-demos.css",
   "src/assets/brand/combric-logo.png",
 ];
@@ -178,6 +183,23 @@ const installationDocs = readFileSync(
   currentSnapshotPath("getting-started/installation.mdx"),
   "utf8",
 );
+const iconsDocs = readFileSync(currentSnapshotPath("icons/index.mdx"), "utf8");
+const regularIconsDocs = readFileSync(
+  currentSnapshotPath("icons/regular.mdx"),
+  "utf8",
+);
+const solidIconsDocs = readFileSync(
+  currentSnapshotPath("icons/solid.mdx"),
+  "utf8",
+);
+const siteTitleSource = readFileSync(
+  join(root, "src/components/SiteTitle.astro"),
+  "utf8",
+);
+const iconsCatalogueSource = readFileSync(
+  join(root, "src/components/IconsCatalogue.tsx"),
+  "utf8",
+);
 const registeredPackageNames = currentDocumentationVersion.packages.map(
   (item) => item.name,
 );
@@ -198,14 +220,16 @@ for (const name of registeredPackageNames)
   if (!packageDocs.includes(`\`${name}\``))
     failures.push(`Package reference docs omit ${name}`);
 if (
-  currentDocumentationVersion.packages.length !== 6 ||
+  currentDocumentationVersion.packages.length !== 7 ||
   registeredPackageNames.some(
     (name) =>
-      !/^(?:@combric\/(?:tokens|layout|react|tailwind|cli|guard))$/.test(name),
+      !/^(?:@combric\/(?:tokens|icons|layout|react|tailwind|cli|guard))$/.test(
+        name,
+      ),
   )
 )
   failures.push(
-    "The current registry must contain only the six public packages",
+    "The current registry must contain only the seven public packages",
   );
 if (
   /^\s+(?:specifier|version):\s+(?:workspace:|link:|portal:|file:|git\+)/m.test(
@@ -280,6 +304,9 @@ if (
     `@combric/react@${currentDocumentationVersion.packageVersion}`,
   ) ||
   !installationDocs.includes(
+    `@combric/icons@${currentDocumentationVersion.packageVersion}`,
+  ) ||
+  !installationDocs.includes(
     `@combric/tokens@${currentDocumentationVersion.packageVersion}`,
   ) ||
   !installationDocs.includes(
@@ -295,6 +322,39 @@ if (
   failures.push(
     `Installation docs do not match the ${currentDocumentationVersion.id} published packages`,
   );
+if (
+  !iconsDocs.includes("@combric/icons/metadata") ||
+  !iconsDocs.includes("ReactNode") ||
+  /^import\s+\*\s+as\s+\w+\s+from\s+["']@combric\/icons["']/m.test(iconsDocs) ||
+  !regularIconsDocs.includes("@combric/icons/css/regular") ||
+  !solidIconsDocs.includes("@combric/icons/css/solid")
+)
+  failures.push(
+    "Icons documentation must preserve the public metadata, slot, and per-style CSS contracts",
+  );
+if (
+  !iconsCatalogueSource.includes('from "@combric/icons/metadata"') ||
+  !iconsCatalogueSource.includes('data-virtualized="true"') ||
+  !iconsCatalogueSource.includes("ResizeObserver") ||
+  iconsCatalogueSource.includes("maximumVisibleIcons") ||
+  !iconsCatalogueSource.includes("data-pagefind-ignore")
+)
+  failures.push(
+    "Icons catalogue must use package metadata, virtualize all results, and remain local to the page",
+  );
+const globalNavLabels = [
+  ...siteTitleSource.matchAll(/^\s*(Docs|Icons|Components|Playground)\s*$/gm),
+].map((match) => match[1]);
+if (
+  globalNavLabels.slice(0, 4).join(",") !==
+    "Docs,Icons,Components,Playground" ||
+  globalNavLabels.slice(4, 8).join(",") !== "Docs,Icons,Components,Playground"
+)
+  failures.push(
+    "Icons must remain between Docs and Components in desktop and mobile top navigation",
+  );
+if (/label:\s*["']Icons["']/.test(astroConfig))
+  failures.push("Icons must not be added to the documentation sidebar");
 for (const [name, version] of Object.entries(packageJson.dependencies ?? {})) {
   if (name.startsWith("@combric/") && version.includes("workspace:"))
     failures.push(`Workspace dependency: ${name}`);
@@ -550,6 +610,9 @@ if (failures.length) {
     "button",
     "index.html",
   );
+  const iconsOverview = currentBuildPath("icons", "index.html");
+  const regularIcons = currentBuildPath("icons", "regular", "index.html");
+  const solidIcons = currentBuildPath("icons", "solid", "index.html");
   const cliDoc = currentBuildPath("getting-started", "cli", "index.html");
   const guardDoc = currentBuildPath("reference", "guard", "index.html");
   const latestRoot = join(root, "dist/docs/latest/index.html");
@@ -567,6 +630,12 @@ if (failures.length) {
   const pagefindIndexes = join(root, "dist/pagefind/index");
   const latestHtml = existsSync(latestDeep)
     ? readFileSync(latestDeep, "utf8")
+    : "";
+  const regularIconsHtml = existsSync(regularIcons)
+    ? readFileSync(regularIcons, "utf8")
+    : "";
+  const solidIconsHtml = existsSync(solidIcons)
+    ? readFileSync(solidIcons, "utf8")
     : "";
   const latestRootHtml = existsSync(latestRoot)
     ? readFileSync(latestRoot, "utf8")
@@ -596,6 +665,9 @@ if (failures.length) {
     existsSync(join(root, "dist")) &&
     (!existsSync(canonicalRoot) ||
       !existsSync(canonicalDeep) ||
+      !existsSync(iconsOverview) ||
+      !existsSync(regularIcons) ||
+      !existsSync(solidIcons) ||
       !existsSync(cliDoc) ||
       !existsSync(guardDoc) ||
       !existsSync(latestRoot) ||
@@ -635,6 +707,29 @@ if (failures.length) {
     ) {
       console.error(
         "FAIL: built Tailwind adapter utilities/tokens are missing",
+      );
+      process.exitCode = 1;
+    }
+    const stylesForPage = (html) =>
+      [...html.matchAll(/href="([^"?]+\.css)(?:\?[^\"]*)?"/g)]
+        .map((match) => match[1])
+        .filter((href) => href.includes("/_astro/"))
+        .map((href) =>
+          join(root, "dist", href.startsWith("/") ? href.slice(1) : href),
+        )
+        .filter(existsSync)
+        .map((path) => readFileSync(path, "utf8"))
+        .join("\n");
+    const regularIconsCss = stylesForPage(regularIconsHtml);
+    const solidIconsCss = stylesForPage(solidIconsHtml);
+    if (
+      !regularIconsHtml.includes("data-pagefind-ignore") ||
+      !solidIconsHtml.includes("data-pagefind-ignore") ||
+      !regularIconsCss.includes(".combric-icon-accessibility") ||
+      solidIconsCss.includes(".combric-icon-accessibility")
+    ) {
+      console.error(
+        "FAIL: icon catalogue pages must retain local search and style-scoped CSS output",
       );
       process.exitCode = 1;
     }

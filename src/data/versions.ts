@@ -10,8 +10,18 @@ export type DocumentationVersion = {
   }>[];
 };
 
-const publicPackages = Object.freeze([
+const v1PublicPackages = Object.freeze([
   { name: "@combric/tokens", integration: "native" },
+  { name: "@combric/layout", integration: "native" },
+  { name: "@combric/react", integration: "native" },
+  { name: "@combric/tailwind", integration: "adapter" },
+  { name: "@combric/cli", integration: "tooling" },
+  { name: "@combric/guard", integration: "tooling" },
+] as const);
+
+const v1_3PublicPackages = Object.freeze([
+  { name: "@combric/tokens", integration: "native" },
+  { name: "@combric/icons", integration: "native" },
   { name: "@combric/layout", integration: "native" },
   { name: "@combric/react", integration: "native" },
   { name: "@combric/tailwind", integration: "adapter" },
@@ -21,12 +31,28 @@ const publicPackages = Object.freeze([
 
 export const documentationVersions = Object.freeze([
   {
+    id: "v1.3.1",
+    label: "v1.3.1",
+    status: "current",
+    packageVersion: "1.3.1",
+    contentRoot: "docs/v1.3.1",
+    packages: v1_3PublicPackages,
+  },
+  {
+    id: "v1.3.0",
+    label: "v1.3.0",
+    status: "previous",
+    packageVersion: "1.3.0",
+    contentRoot: "docs/v1.3.0",
+    packages: v1_3PublicPackages,
+  },
+  {
     id: "v1.2.0",
     label: "v1.2.0",
-    status: "current",
+    status: "previous",
     packageVersion: "1.2.0",
     contentRoot: "docs/v1.2.0",
-    packages: publicPackages,
+    packages: v1PublicPackages,
   },
   {
     id: "v1.1.1",
@@ -34,7 +60,7 @@ export const documentationVersions = Object.freeze([
     status: "previous",
     packageVersion: "1.1.1",
     contentRoot: "docs/v1.1.1",
-    packages: publicPackages,
+    packages: v1PublicPackages,
   },
   {
     id: "v1.1.0",
@@ -42,7 +68,7 @@ export const documentationVersions = Object.freeze([
     status: "previous",
     packageVersion: "1.1.0",
     contentRoot: "docs/v1.1.0",
-    packages: publicPackages,
+    packages: v1PublicPackages,
   },
   {
     id: "v1.0.0",
@@ -50,7 +76,7 @@ export const documentationVersions = Object.freeze([
     status: "previous",
     packageVersion: "1.0.0",
     contentRoot: "docs/v1.0.0",
-    packages: publicPackages,
+    packages: v1PublicPackages,
   },
 ] as readonly DocumentationVersion[]);
 

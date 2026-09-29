@@ -72,7 +72,12 @@ const importCode = `import { ${item.publicExports.join(", ")} } from "@combric/r
 )}
 
 {section === "api" && (
-  <div class="combric-docs-api">
+  <div
+    class="combric-docs-api"
+    tabindex="0"
+    role="region"
+    aria-label="Layout API tables"
+  >
     <table>
       <caption>Public exports</caption>
       <thead>

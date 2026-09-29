@@ -1,0 +1,184 @@
+---
+title: Motion
+description: The Combric 1.3.1 published motion contract.
+---
+
+import MotionDemo from "../../../../components/MotionDemo";
+
+## Overview
+
+Motion is built into Combric components. It needs no animation library, provider,
+or extra JavaScript configuration. Import the native stylesheet once:
+
+```css
+@import "@combric/react/css";
+```
+
+Combric owns logical state, presence, portals, focus, keyboard behavior,
+accessibility, interruption, and cleanup. CSS controls visual presentation.
+
+> This is the published `1.3.1` motion contract. The synchronized public
+> packages are available from npm at `1.3.1`.
+
+## Default motion
+
+Use a component normally after loading `@combric/react/css`. Dialogs, drawers,
+menus, popovers, tooltips, toasts, disclosure panels, switches, and tabs receive
+their built-in motion automatically.
+
+```tsx
+<Dialog>
+  <DialogTrigger>Open dialog</DialogTrigger>
+  <DialogContent>
+    <DialogTitle>Account</DialogTitle>
+    <DialogDescription>Review account settings.</DialogDescription>
+  </DialogContent>
+</Dialog>
+```
+
+## Motion tokens
+
+These names and defaults come from the published `@combric/tokens` package. The
+CSS variables are generated from the token names; React components consume the
+variables rather than carrying duplicate duration values.
+
+| Token                    | CSS variable                       | Default                         | Purpose                        |
+| ------------------------ | ---------------------------------- | ------------------------------- | ------------------------------ |
+| `motion.duration.fast`   | `--combric-motion-duration-fast`   | `800ms`                         | Spinner rotation               |
+| `motion.duration.micro`  | `--combric-motion-duration-micro`  | `120ms`                         | Switch and tab interaction     |
+| `motion.duration.normal` | `--combric-motion-duration-normal` | `180ms`                         | Overlays and disclosure panels |
+| `motion.duration.slow`   | `--combric-motion-duration-slow`   | `1500ms`                        | Skeleton pulse                 |
+| `motion.easing.enter`    | `--combric-motion-easing-enter`    | `cubic-bezier(0.16, 1, 0.3, 1)` | Entering motion                |
+| `motion.easing.exit`     | `--combric-motion-easing-exit`     | `cubic-bezier(0.7, 0, 0.84, 0)` | Exiting motion                 |
+| `motion.easing.standard` | `--combric-motion-easing-standard` | `cubic-bezier(0.2, 0, 0, 1)`    | State and size changes         |
+
+## Customize globally
+
+Override the generated variables in application CSS; no component JSX changes
+are needed:
+
+```css
+:root {
+  --combric-motion-duration-micro: 90ms;
+  --combric-motion-duration-normal: 260ms;
+  --combric-motion-easing-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --combric-motion-easing-exit: cubic-bezier(0.7, 0, 0.84, 0);
+}
+```
+
+The same variables drive Dialog/Drawer, Dropdown, Switch, Accordion, and
+Collapsible motion.
+
+## Disable globally
+
+Set the native root attribute to disable optional Combric motion throughout the
+document, including portalled content:
+
+```html
+<html data-combric-motion="off"></html>
+```
+
+The opt-out zeroes Combric duration tokens and stops its spinner/skeleton
+animations. It does not change component state, focus, keyboard behavior, or
+accessibility. Remove the attribute to restore the defaults.
+
+## Disable one component
+
+Use the existing `className` extension point and consumer CSS; no motion prop is
+required:
+
+```tsx
+<DialogContent className="no-motion">...</DialogContent>
+```
+
+```css
+.no-motion {
+  transition: none !important;
+  animation: none !important;
+}
+```
+
+The lifecycle detects that there is no visual animation to await and cleans up
+the closed content immediately. Apply the class to Dropdown content or Toast in
+the same way.
+
+## Custom motion
+
+Use `className` together with the public `data-state`, `data-presence`, and
+`data-side` attributes. These examples replace presentation while Combric
+continues to own lifecycle and interaction.
+
+```tsx
+<DropdownMenuContent className="brand-menu">...</DropdownMenuContent>
+<DrawerContent className="brand-drawer" side="right">...</DrawerContent>
+```
+
+```css
+.brand-menu {
+  transition:
+    opacity 240ms ease,
+    transform 240ms ease;
+}
+.brand-menu[data-presence="entering"],
+.brand-menu[data-state="closed"] {
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.98);
+}
+.brand-menu[data-state="open"][data-presence="entered"] {
+  opacity: 1;
+  transform: none;
+}
+
+.brand-drawer[data-side="right"] {
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+.brand-drawer[data-side="right"][data-presence="entering"],
+.brand-drawer[data-side="right"][data-state="closed"] {
+  opacity: 0;
+  transform: translateX(2rem) rotate(1deg);
+}
+.brand-drawer[data-side="right"][data-state="open"][data-presence="entered"] {
+  opacity: 1;
+  transform: translateX(0) rotate(0);
+}
+```
+
+Custom CSS transitions are observed at their actual computed duration. Reduced
+motion, zero duration, and `transition: none` do not leave hidden content
+mounted.
+
+## Reduced motion
+
+Combric automatically follows `prefers-reduced-motion: reduce`. The preference
+removes transitions and continuous decorative animations even when consumers
+override duration tokens. Its accessibility rule has precedence over ordinary
+custom motion declarations; respect the user's system preference.
+
+## Component Motion reference
+
+| Component      | Published behavior                                                           |
+| -------------- | ---------------------------------------------------------------------------- |
+| Accordion      | Content block-size transition; reduced-motion aware                          |
+| Collapsible    | Content block-size transition; reduced-motion aware                          |
+| Dialog         | Backdrop fade and content fade/scale; presence-aware exit                    |
+| Drawer / Sheet | Backdrop fade and directional content travel; `data-side` selects left/right |
+| Dropdown       | Content fade/translate/scale; presence-aware exit                            |
+| Popover        | Content fade/translate/scale; presence-aware exit                            |
+| Tooltip        | Content fade/translate/scale; presence-aware exit                            |
+| Toast          | Content fade/translate/scale; presence-aware exit                            |
+| Switch         | Thumb transform transition                                                   |
+| Tabs           | Active trigger color/background transition                                   |
+| Spinner        | Continuous rotation; stopped for reduced motion                              |
+| Skeleton       | Continuous pulse; stopped for reduced motion                                 |
+| Checkbox       | No decorative motion                                                         |
+| Radio Group    | No decorative motion                                                         |
+
+## Interactive comparison
+
+Choose a mode, then open the menu or right Drawer. “Reduced-motion preview” is
+a local visual preview; real reduced-motion behavior follows the browser and
+operating-system preference.
+
+<MotionDemo client:load />

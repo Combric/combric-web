@@ -740,6 +740,48 @@ const demoTemplates = Object.freeze([
     exampleKey: "avatar-image",
     title: "AvatarImage",
   },
+  {
+    id: "v1.3.0/button/icons",
+    version: "v1.3.0",
+    catalogueSlug: "button",
+    exampleKey: "button-icons",
+    title: "Leading and trailing icons",
+  },
+  {
+    id: "v1.3.0/breadcrumb/icons",
+    version: "v1.3.0",
+    catalogueSlug: "breadcrumb",
+    exampleKey: "breadcrumb-icons",
+    title: "Decorative navigation icons",
+  },
+  {
+    id: "v1.3.0/card/icons",
+    version: "v1.3.0",
+    catalogueSlug: "card",
+    exampleKey: "card-icons",
+    title: "Title icon",
+  },
+  {
+    id: "v1.3.0/dialog/icons",
+    version: "v1.3.0",
+    catalogueSlug: "dialog",
+    exampleKey: "dialog-icons",
+    title: "Trigger, title, and close icons",
+  },
+  {
+    id: "v1.3.0/dropdown-menu/icons",
+    version: "v1.3.0",
+    catalogueSlug: "dropdown-menu",
+    exampleKey: "dropdown-menu-icons",
+    title: "Trigger and item icons",
+  },
+  {
+    id: "v1.3.0/empty-state/icons",
+    version: "v1.3.0",
+    catalogueSlug: "empty-state",
+    exampleKey: "empty-state-icons",
+    title: "Media and title icons",
+  },
 ] satisfies readonly CatalogueDemoMetadata[]);
 
 function versionAtLeast(

@@ -8,6 +8,8 @@ import {
 const releaseSurfaces = [
   "/",
   docsRoute(currentDocumentationVersion),
+  docsRoute(currentDocumentationVersion, "icons/regular"),
+  docsRoute(currentDocumentationVersion, "icons/solid"),
   docsRoute(currentDocumentationVersion, "components/actions/button"),
   docsRoute(currentDocumentationVersion, "accessibility"),
   "/playground/",
@@ -89,10 +91,26 @@ test("mobile dark-mode navigation, search, catalogue overlay, and Playground rem
   ).toBeVisible();
   await expectAccessible(page);
 
+  await page.goto(docsRoute(currentDocumentationVersion, "icons/regular"));
+  await page.getByLabel("Search regular icons").fill("activity");
+  await expect(page.locator("[data-icon-card]")).toHaveCount(1);
+  await expectAccessible(page);
+  const iconDimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+  expect(iconDimensions.scrollWidth).toBeLessThanOrEqual(
+    iconDimensions.clientWidth,
+  );
+
   await page.goto(
     docsRoute(currentDocumentationVersion, "components/overlays/dialog"),
   );
-  const trigger = page.getByRole("button", { name: "Open dialog" });
+  const trigger = page
+    .locator(
+      `[data-demo-id="${currentDocumentationVersion.id}/dialog/default"]`,
+    )
+    .getByRole("button", { name: "Open dialog" });
   await trigger.click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await expectAccessible(page);
