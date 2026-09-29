@@ -28,8 +28,8 @@ const adapterPackages = publicPackages.filter(
 );
 
 assert.equal(version, currentDocumentationVersion.id.slice(1));
-assert.equal(publicPackages.length, 6);
-assert.equal(new Set(publicPackages.map((item) => item.name)).size, 6);
+assert.equal(publicPackages.length, 7);
+assert.equal(new Set(publicPackages.map((item) => item.name)).size, 7);
 for (const name of ["@combric/tokens", "@combric/layout", "@combric/react"]) {
   assert.equal(
     packageJson.dependencies[name],
@@ -156,7 +156,8 @@ try {
     "react-dom": packageJson.dependencies["react-dom"],
   };
   const native = await createFixture("native", nativeDependencies, {
-    "styles.css": '@import "@combric/react/css";\n',
+    "styles.css":
+      '@import "@combric/react/css";\n@import "@combric/icons/css/regular";\n',
   });
   for (const item of nativePackages)
     await assertInstalledVersion(native, item.name);
@@ -179,15 +180,39 @@ try {
     import { renderToStaticMarkup } from "react-dom/server";
     import * as tokens from "@combric/tokens";
     import * as components from "@combric/react";
+    import { ActivityIcon, iconCatalog } from "@combric/icons";
+    import { AdobeAfterEffectsIcon } from "@combric/icons/solid";
+    import { ActivityIcon as DirectActivityIcon } from "@combric/icons/regular/activity";
     assert.ok(Object.keys(tokens).length > 0);
     assert.equal(typeof components.Button, "function");
     const html = renderToStaticMarkup(createElement(components.Button, null, "Public consumer"));
     assert.match(html, /Public consumer/);
-    for (const specifier of ["@combric/tokens/css", "@combric/layout/css", "@combric/react/css"]) {
+    assert.equal(typeof ActivityIcon, "function");
+    assert.equal(typeof AdobeAfterEffectsIcon, "function");
+    assert.equal(typeof DirectActivityIcon, "function");
+    assert.ok(iconCatalog.some((icon) => icon.name === "activity"));
+    const iconSlotHtml = renderToStaticMarkup(
+      createElement(
+        components.Button,
+        { leadingIcon: createElement(ActivityIcon) },
+        "Activity",
+      ),
+    );
+    assert.match(iconSlotHtml, /combric-icon-slot/);
+    assert.match(iconSlotHtml, /data-combric-icon="activity"/);
+    for (const specifier of [
+      "@combric/tokens/css",
+      "@combric/layout/css",
+      "@combric/react/css",
+      "@combric/icons/css/regular",
+      "@combric/icons/css/solid",
+      "@combric/icons/metadata.json",
+      "@combric/icons/svg/regular/activity.svg",
+    ]) {
       const entry = import.meta.resolve(specifier);
       assert.ok((await readFile(fileURLToPath(entry), "utf8")).trim().length > 0, specifier);
     }
-    console.log("PASS: published tokens, layout CSS, and React work without Tailwind");
+    console.log("PASS: published tokens, layout CSS, React, and Icons work without Tailwind");
   `;
   run(process.execPath, ["--input-type=module", "-e", nativeProbe], native);
 

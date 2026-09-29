@@ -49,6 +49,7 @@ import {
   EmptyState,
   EmptyStateActions,
   EmptyStateDescription,
+  EmptyStateMedia,
   EmptyStateTitle,
   Field,
   FieldDescription,
@@ -101,6 +102,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@combric/react";
+import {
+  ActivityIcon,
+  ArrowRightIcon,
+  CheckIcon,
+  XmarkIcon,
+} from "@combric/icons";
 import { useState, type ComponentType, type CSSProperties } from "react";
 import { Cluster, Container, Grid, Inline, Stack } from "@combric/react";
 import { catalogue } from "../data/catalogue";
@@ -250,6 +257,27 @@ export function Example() {
       <Button radius="md">Medium</Button>
       <Button radius="lg">Large</Button>
       <Button radius="full">Full</Button>
+    </div>
+  );
+}`,
+  ),
+  "button-icons": define(
+    () => (
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
+        <Button leadingIcon={<ActivityIcon />}>View activity</Button>
+        <Button variant="secondary" trailingIcon={<ArrowRightIcon />}>
+          Continue
+        </Button>
+      </div>
+    ),
+    `import { ActivityIcon, ArrowRightIcon } from "@combric/icons";
+import { Button } from "@combric/react";
+
+export function Example() {
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem" }}>
+      <Button leadingIcon={<ActivityIcon />}>View activity</Button>
+      <Button variant="secondary" trailingIcon={<ArrowRightIcon />}>Continue</Button>
     </div>
   );
 }`,
@@ -777,6 +805,31 @@ export function Example() {
   return <Breadcrumb><BreadcrumbList><BreadcrumbItem><BreadcrumbLink href="/">Home</BreadcrumbLink></BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbPage>Docs</BreadcrumbPage></BreadcrumbItem></BreadcrumbList></Breadcrumb>;
 }`,
   ),
+  "breadcrumb-icons": define(
+    () => (
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/docs/latest/" leadingIcon={<ActivityIcon />}>
+              Workspace
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator icon={<ArrowRightIcon />} />
+          <BreadcrumbItem>
+            <BreadcrumbPage trailingIcon={<ActivityIcon />}>
+              Activity
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+    ),
+    `import { ActivityIcon, ArrowRightIcon } from "@combric/icons";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@combric/react";
+
+export function Example() {
+  return <Breadcrumb><BreadcrumbList><BreadcrumbItem><BreadcrumbLink href="/" leadingIcon={<ActivityIcon />}>Workspace</BreadcrumbLink></BreadcrumbItem><BreadcrumbSeparator icon={<ArrowRightIcon />} /><BreadcrumbItem><BreadcrumbPage trailingIcon={<ActivityIcon />}>Activity</BreadcrumbPage></BreadcrumbItem></BreadcrumbList></Breadcrumb>;
+}`,
+  ),
   pagination: define(
     () => (
       <Pagination>
@@ -994,6 +1047,23 @@ export function Example() {
   );
 }`,
   ),
+  "card-icons": define(
+    () => (
+      <Card>
+        <CardHeader>
+          <CardTitle icon={<ActivityIcon />}>Project activity</CardTitle>
+          <CardDescription>Latest events from your workspace.</CardDescription>
+        </CardHeader>
+        <CardContent>All systems are available.</CardContent>
+      </Card>
+    ),
+    `import { ActivityIcon } from "@combric/icons";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@combric/react";
+
+export function Example() {
+  return <Card><CardHeader><CardTitle icon={<ActivityIcon />}>Project activity</CardTitle><CardDescription>Latest events from your workspace.</CardDescription></CardHeader><CardContent>All systems are available.</CardContent></Card>;
+}`,
+  ),
   separator: define(
     () => (
       <div>
@@ -1146,6 +1216,28 @@ export function Example() {
   return <Dialog><DialogTrigger>Open dialog</DialogTrigger><DialogContent><DialogTitle>Confirm change</DialogTitle><DialogDescription>This action updates the project.</DialogDescription><DialogClose>Cancel</DialogClose></DialogContent></Dialog>;
 }`,
   ),
+  "dialog-icons": define(
+    () => (
+      <Dialog>
+        <DialogTrigger leadingIcon={<ActivityIcon />}>
+          Open dialog
+        </DialogTrigger>
+        <DialogContent>
+          <DialogTitle icon={<ActivityIcon />}>Confirm change</DialogTitle>
+          <DialogDescription>
+            This action updates the project.
+          </DialogDescription>
+          <DialogClose trailingIcon={<XmarkIcon />}>Cancel</DialogClose>
+        </DialogContent>
+      </Dialog>
+    ),
+    `import { ActivityIcon, XmarkIcon } from "@combric/icons";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@combric/react";
+
+export function Example() {
+  return <Dialog><DialogTrigger leadingIcon={<ActivityIcon />}>Open dialog</DialogTrigger><DialogContent><DialogTitle icon={<ActivityIcon />}>Confirm change</DialogTitle><DialogDescription>This action updates the project.</DialogDescription><DialogClose trailingIcon={<XmarkIcon />}>Cancel</DialogClose></DialogContent></Dialog>;
+}`,
+  ),
   drawer: define(
     () => (
       <Drawer>
@@ -1195,6 +1287,30 @@ export function Example() {
 
 export function Example() {
   return <DropdownMenu><DropdownMenuTrigger>Actions</DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem>Edit</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem disabled>Archive</DropdownMenuItem></DropdownMenuContent></DropdownMenu>;
+}`,
+  ),
+  "dropdown-menu-icons": define(
+    () => (
+      <DropdownMenu>
+        <DropdownMenuTrigger leadingIcon={<ActivityIcon />}>
+          Actions
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem leadingIcon={<CheckIcon />}>
+            Publish
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem trailingIcon={<ArrowRightIcon />}>
+            Move
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+    `import { ActivityIcon, ArrowRightIcon, CheckIcon } from "@combric/icons";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@combric/react";
+
+export function Example() {
+  return <DropdownMenu><DropdownMenuTrigger leadingIcon={<ActivityIcon />}>Actions</DropdownMenuTrigger><DropdownMenuContent><DropdownMenuItem leadingIcon={<CheckIcon />}>Publish</DropdownMenuItem><DropdownMenuSeparator /><DropdownMenuItem trailingIcon={<ArrowRightIcon />}>Move</DropdownMenuItem></DropdownMenuContent></DropdownMenu>;
 }`,
   ),
   "dropdown-menu-positioning": define(
@@ -1384,6 +1500,28 @@ export function Example() {
 
 export function Example() {
   return <EmptyState><EmptyStateTitle level={3}>No projects</EmptyStateTitle><EmptyStateDescription>Create a project to begin.</EmptyStateDescription><EmptyStateActions><Button>Create project</Button></EmptyStateActions></EmptyState>;
+}`,
+  ),
+  "empty-state-icons": define(
+    () => (
+      <EmptyState>
+        <EmptyStateMedia icon={<ActivityIcon />} />
+        <EmptyStateTitle level={3} icon={<ActivityIcon />}>
+          No activity
+        </EmptyStateTitle>
+        <EmptyStateDescription>
+          New project activity will appear here.
+        </EmptyStateDescription>
+        <EmptyStateActions>
+          <Button>Open project</Button>
+        </EmptyStateActions>
+      </EmptyState>
+    ),
+    `import { ActivityIcon } from "@combric/icons";
+import { Button, EmptyState, EmptyStateActions, EmptyStateDescription, EmptyStateMedia, EmptyStateTitle } from "@combric/react";
+
+export function Example() {
+  return <EmptyState><EmptyStateMedia icon={<ActivityIcon />} /><EmptyStateTitle level={3} icon={<ActivityIcon />}>No activity</EmptyStateTitle><EmptyStateDescription>New project activity will appear here.</EmptyStateDescription><EmptyStateActions><Button>Open project</Button></EmptyStateActions></EmptyState>;
 }`,
   ),
   "spinner-decorative": define(

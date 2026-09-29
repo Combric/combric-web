@@ -1,0 +1,46 @@
+---
+title: Installation
+description: Install the published Combric 1.3.1 packages.
+---
+
+This is the published `v1.3.1` documentation snapshot. The public Combric
+packages are synchronized at stable version `1.3.1` on npm.
+
+## React components
+
+```sh
+npm install @combric/react@1.3.1 react@^19 react-dom@^19
+```
+
+React and React DOM `>=19.0.0 <20` are peer dependencies.
+
+## Icons
+
+```sh
+npm install @combric/icons@1.3.1
+```
+
+Icons can be used as CSS or SVG assets without React. React is an optional peer
+when consuming the React icon exports. See the [Icons reference](/docs/v1.3.1/icons/)
+for the smallest useful import pattern.
+
+## Tokens only
+
+```sh
+npm install @combric/tokens@1.3.1
+```
+
+## Framework-independent layout
+
+```sh
+npm install @combric/layout@1.3.1
+```
+
+## Optional Tailwind adapter
+
+```sh
+npm install @combric/tailwind@1.3.1 tailwindcss
+```
+
+Tailwind CSS must satisfy `>=4.3.0 <5`. Combric does not require the CLI,
+Tailwind, or source-copy installation.

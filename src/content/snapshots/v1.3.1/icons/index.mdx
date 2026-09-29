@@ -1,0 +1,195 @@
+---
+title: Icons
+description: Install, browse, and use the public Combric Icons package.
+---
+
+`@combric/icons` is Combric's public icon package. It ships Iconoir-derived
+regular and solid icons for React, CSS masks, original SVG assets, and typed
+metadata. The package is usable independently of `@combric/react`.
+
+[Browse regular icons](/docs/v1.3.1/icons/regular/) · [Browse solid icons](/docs/v1.3.1/icons/solid/)
+
+## Install
+
+```sh
+npm install @combric/icons@1.3.1
+```
+
+React is an optional peer dependency for React icon exports and must satisfy
+`>=19.0.0 <20`. CSS, SVG, and metadata consumers do not need React.
+
+## Import the smallest useful surface
+
+The root entry point exports regular React icons. Use a named import with a
+modern bundler for the normal React pattern:
+
+```tsx
+import { ActivityIcon } from "@combric/icons";
+```
+
+Solid icons use their own entry point:
+
+```tsx
+import { ActivityIcon } from "@combric/icons/solid";
+```
+
+When a direct module better suits a consumer's bundling strategy, use the
+per-icon regular subpath:
+
+```tsx
+import { ActivityIcon } from "@combric/icons/regular/activity";
+```
+
+Avoid a full namespace import such as `import * as Icons`: it obscures which
+icons the application needs. The catalogue below uses metadata only and never
+loads a namespace of SVG React components.
+
+## React
+
+Icons are decorative by default, with `aria-hidden="true"` and
+`focusable="false"`. Give an icon its own accessible meaning only when it
+communicates information independently, using `aria-label`, `aria-labelledby`,
+or `title`:
+
+```tsx
+import { ActivityIcon } from "@combric/icons";
+
+export function ActivityStatus() {
+  return <ActivityIcon aria-label="Recent activity" />;
+}
+```
+
+Use `size`, `width`, `height`, `color`, `strokeWidth`, `className`, and standard
+SVG props as needed. A `title` or ARIA label turns the SVG into an image role;
+do not add one when nearby visible text already supplies the meaning.
+
+## React component slots
+
+`@combric/react` intentionally accepts `ReactNode` for every icon slot. It is
+not coupled to `@combric/icons` or Iconoir: another React icon library or a
+custom compatible React node works equally well. Combric Icons is the official
+reference implementation.
+
+```tsx
+import { ActivityIcon, ArrowRightIcon } from "@combric/icons";
+import { Button } from "@combric/react";
+
+export function SaveProject() {
+  return (
+    <Button leadingIcon={<ActivityIcon />} trailingIcon={<ArrowRightIcon />}>
+      View activity
+    </Button>
+  );
+}
+```
+
+Every slot listed below has type `ReactNode` and is wrapped by the component as
+decorative content (`aria-hidden="true"`). The control or heading must retain
+its own visible text or accessible name; a labelled SVG inside a slot does not
+become the component's accessible name.
+
+| Component                        | Public prop                   | Placement          |
+| -------------------------------- | ----------------------------- | ------------------ |
+| `Button`                         | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `Toggle`                         | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `ToggleGroupItem`                | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `AccordionTrigger`               | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `CollapsibleTrigger`             | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `Badge`                          | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `Label`                          | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `FieldLegend`                    | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `BreadcrumbLink`                 | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `BreadcrumbPage`                 | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `BreadcrumbSeparator`            | `icon`                        | Separator          |
+| `PaginationLink`                 | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `PaginationPrevious`             | `icon`                        | Leading            |
+| `PaginationNext`                 | `icon`                        | Trailing           |
+| `TabsTrigger`                    | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `DropdownMenuTrigger`            | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `DropdownMenuItem`               | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `PopoverTrigger`                 | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `TooltipTrigger`                 | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `DialogTrigger`                  | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `DialogClose`                    | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `DialogTitle`                    | `icon`                        | Title              |
+| `DrawerTrigger` / `SheetTrigger` | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `DrawerClose` / `SheetClose`     | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `DrawerTitle` / `SheetTitle`     | `icon`                        | Title              |
+| `ToastClose`                     | `leadingIcon`, `trailingIcon` | Leading / trailing |
+| `ToastTitle`                     | `icon`                        | Title              |
+| `CardTitle`                      | `icon`                        | Title              |
+| `AlertTitle`                     | `icon`                        | Title              |
+| `EmptyStateMedia`                | `icon`                        | Media              |
+| `EmptyStateTitle`                | `icon`                        | Title              |
+
+For an icon-only button, give the control—not its slot—a name:
+
+```tsx
+import { ActivityIcon } from "@combric/icons";
+import { Button } from "@combric/react";
+
+export function OpenActivity() {
+  return (
+    <Button aria-label="Open activity">
+      <ActivityIcon />
+    </Button>
+  );
+}
+```
+
+The component catalogue contains live reference examples for [Button](/docs/v1.3.1/components/actions/button/), [Breadcrumb](/docs/v1.3.1/components/navigation/breadcrumb/), [Dropdown Menu](/docs/v1.3.1/components/overlays/dropdown-menu/), [Dialog](/docs/v1.3.1/components/overlays/dialog/), [Card](/docs/v1.3.1/components/data-display/card/), and [Empty State](/docs/v1.3.1/components/feedback/empty-state/).
+
+## CSS
+
+CSS masks are available without React. Import only the style you use in a
+given application surface:
+
+```css
+@import "@combric/icons/css/regular";
+
+.save-mark {
+  color: var(--combric-color-accent);
+}
+```
+
+```html
+<span
+  class="combric-icon combric-icon-save save-mark"
+  aria-hidden="true"
+></span>
+```
+
+Use `@combric/icons/css/solid` for solid icons. The combined
+`@combric/icons/css` entry point includes both styles; keep regular and solid
+imports separate when only one is needed.
+
+## SVG and metadata
+
+Original SVG assets are available to bundlers from their public subpaths:
+
+```ts
+import saveSvg from "@combric/icons/svg/regular/save.svg";
+```
+
+The typed metadata entry point is intended for developer tools, catalogues, and
+search—not for maintaining a duplicate icon list:
+
+```ts
+import { iconCatalog, iconNames, type IconName } from "@combric/icons/metadata";
+
+const names: readonly IconName[] = iconNames;
+const componentNames = iconCatalog.map((icon) => icon.componentName);
+```
+
+`@combric/icons/metadata.json` is the matching JSON surface for non-TypeScript
+tools. The catalogue pages on this site are driven by the typed metadata entry
+point.
+
+## Browse the catalogue
+
+Use the source-backed browser for fast name/component search and copyable
+imports. Each result page renders at most 48 cards, so searching thousands of
+SVGs does not turn into a large simultaneous DOM mount.
+
+- [Regular icons](/docs/v1.3.1/icons/regular/)
+- [Solid icons](/docs/v1.3.1/icons/solid/)

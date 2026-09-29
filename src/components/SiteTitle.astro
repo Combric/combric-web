@@ -11,7 +11,14 @@ const onComponentsPage = pathname.includes("/components/");
 const onPlaygroundPage = pathname.startsWith("/playground/");
 const latestDocsRoute = latestRoute();
 const currentDocsRoute = docsRoute(currentDocumentationVersion);
-const latestComponentsRoute = latestRoute("components/actions/button");
+const currentComponentsRoute = docsRoute(
+  currentDocumentationVersion,
+  "components/actions/button",
+);
+const currentIconsRoute = docsRoute(currentDocumentationVersion, "icons");
+const onIconsPage =
+  pathname === currentIconsRoute ||
+  pathname.startsWith(`${currentIconsRoute}/`);
 const onDocsLanding =
   pathname === latestDocsRoute || pathname === currentDocsRoute;
 ---
@@ -27,11 +34,17 @@ const onDocsLanding =
     <span translate="no">Combric</span>
   </a>
   <nav class="combric-global-nav" aria-label="Main navigation">
-    <a href={latestDocsRoute} aria-current={onDocsLanding ? "page" : undefined}>
+    <a
+      href={currentDocsRoute}
+      aria-current={onDocsLanding ? "page" : undefined}
+    >
       Docs
     </a>
+    <a href={currentIconsRoute} aria-current={onIconsPage ? "page" : undefined}>
+      Icons
+    </a>
     <a
-      href={latestComponentsRoute}
+      href={currentComponentsRoute}
       aria-current={onComponentsPage ? "page" : undefined}
     >
       Components
@@ -44,13 +57,19 @@ const onDocsLanding =
     <summary>Explore</summary>
     <nav aria-label="Main navigation">
       <a
-        href={latestDocsRoute}
+        href={currentDocsRoute}
         aria-current={onDocsLanding ? "page" : undefined}
       >
         Docs
       </a>
       <a
-        href={latestComponentsRoute}
+        href={currentIconsRoute}
+        aria-current={onIconsPage ? "page" : undefined}
+      >
+        Icons
+      </a>
+      <a
+        href={currentComponentsRoute}
         aria-current={onComponentsPage ? "page" : undefined}
       >
         Components

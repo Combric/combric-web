@@ -153,6 +153,10 @@ test("catalogue exposes real sections, navigation and representative public cove
   if (isMobile) await page.getByText("Explore", { exact: true }).click();
   const mainNav = page.getByRole("navigation", { name: "Main navigation" });
   await expect(mainNav.getByRole("link", { name: "Docs" })).toBeVisible();
+  await expect(mainNav.getByRole("link", { name: "Icons" })).toHaveAttribute(
+    "href",
+    docsRoute(currentDocumentationVersion, "icons"),
+  );
   await expect(
     mainNav.getByRole("link", { name: "Components" }),
   ).toHaveAttribute("aria-current", "page");
@@ -192,6 +196,165 @@ test("catalogue exposes real sections, navigation and representative public cove
     }),
   ).toBeVisible();
   await expectNoAxeViolations(page);
+});
+
+test("Icons topbar route provides a complete source-backed browser", async ({
+  page,
+  context,
+  isMobile,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto(docsRoute(currentDocumentationVersion, "icons/regular"));
+  if (isMobile) await page.getByText("Explore", { exact: true }).click();
+  const navigation = page.getByRole("navigation", { name: "Main navigation" });
+  const iconsLink = navigation.getByRole("link", { name: "Icons" });
+  await expect(iconsLink).toHaveAttribute("aria-current", "page");
+  await expect(iconsLink).toHaveAttribute(
+    "href",
+    docsRoute(currentDocumentationVersion, "icons"),
+  );
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Regular Icons" }),
+  ).toBeVisible();
+
+  const search = page.getByLabel("Search regular icons");
+  const grid = page.locator("[data-icon-grid]");
+  await expect(grid).toHaveAttribute("data-virtualized", "true");
+  const totalIcons = Number(await grid.getAttribute("data-total-icons"));
+  expect(totalIcons).toBeGreaterThan(48);
+  expect(await page.locator("[data-icon-card]").count()).toBeLessThan(
+    totalIcons,
+  );
+  const gridMetrics = await grid.evaluate((element) => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+  }));
+  expect(gridMetrics.scrollHeight).toBeGreaterThan(gridMetrics.clientHeight);
+  await grid.evaluate((element) =>
+    element.scrollTo({ top: element.scrollHeight }),
+  );
+  await expect
+    .poll(() =>
+      page.locator("[data-icon-card]").last().getAttribute("aria-posinset"),
+    )
+    .toBe(String(totalIcons));
+  await search.fill("activity");
+  await expect(
+    page.locator("#combric-icons-regular-search-results"),
+  ).toHaveText(
+    "1 regular icon available. Select it to view its implementation.",
+  );
+  await expect(page.locator("[data-icon-card]")).toHaveCount(1);
+  const activityTile = page.getByRole("button", {
+    name: "Open ActivityIcon implementation details",
+  });
+  await activityTile.click();
+  const drawer = page.locator("dialog.combric-icons-catalogue__drawer");
+  await expect(drawer).toBeVisible();
+  const drawerContent = drawer.locator(
+    ".combric-icons-catalogue__drawer-content",
+  );
+  await expect(drawerContent).toBeVisible();
+  const drawerSpacing = await drawerContent.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      boxSizing: style.boxSizing,
+      padding: [
+        style.paddingTop,
+        style.paddingRight,
+        style.paddingBottom,
+        style.paddingLeft,
+      ].map((value) => Number.parseFloat(value)),
+    };
+  });
+  expect(drawerSpacing.boxSizing).toBe("border-box");
+  for (const padding of drawerSpacing.padding) {
+    expect(padding).toBeGreaterThanOrEqual(16);
+  }
+  const drawerLayout = await drawer.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      position: style.position,
+      right: style.right,
+      top: style.top,
+      bottom: style.bottom,
+      borderTopWidth: style.borderTopWidth,
+      borderLeftWidth: style.borderLeftWidth,
+    };
+  });
+  expect(drawerLayout.position).toBe("fixed");
+  expect(drawerLayout.right).toBe("0px");
+  if (isMobile) {
+    expect(drawerLayout.bottom).toBe("0px");
+    expect(drawerLayout.borderTopWidth).toBe("1px");
+  } else {
+    expect(drawerLayout.top).toBe("0px");
+    expect(drawerLayout.bottom).toBe("0px");
+    expect(drawerLayout.borderLeftWidth).toBe("1px");
+  }
+  await expect(
+    drawer.getByRole("heading", { name: "ActivityIcon" }),
+  ).toBeVisible();
+  await drawer
+    .getByRole("button", { name: "Copy ActivityIcon React implementation" })
+    .click();
+  await expect(
+    drawer.locator(".combric-icons-catalogue__drawer-status"),
+  ).toContainText("Copied ActivityIcon React implementation.");
+  await expect
+    .poll(() =>
+      page.evaluate(async () =>
+        (await navigator.clipboard.readText()).replaceAll("\r\n", "\n"),
+      ),
+    )
+    .toBe(
+      'import { ActivityIcon } from "@combric/icons";\n\n<ActivityIcon aria-label="Activity" />',
+    );
+  await drawer
+    .getByRole("button", { name: "Close ActivityIcon details" })
+    .click();
+  await expect(drawer).toHaveAttribute("data-closing", "true");
+  await expect(drawer).toBeVisible();
+  expect(
+    await drawer.evaluate((element) => getComputedStyle(element).animationName),
+  ).toBe(
+    isMobile
+      ? "combric-icons-catalogue-sheet-out"
+      : "combric-icons-catalogue-drawer-out",
+  );
+  await expect(drawer).toBeHidden();
+  await expect(activityTile).toBeFocused();
+  const dimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
+  await expectNoAxeViolations(page);
+});
+
+test("Icons navigation marks the landing route as active", async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto(docsRoute(currentDocumentationVersion, "icons"));
+  if (isMobile) await page.getByText("Explore", { exact: true }).click();
+
+  const iconsLink = page
+    .getByRole("navigation", { name: "Main navigation" })
+    .getByRole("link", { name: "Icons" });
+  await expect(iconsLink).toHaveAttribute("aria-current", "page");
+  if (!isMobile) {
+    const activeIndicator = await iconsLink.evaluate((element) => {
+      const style = getComputedStyle(element, "::after");
+      return {
+        content: style.content,
+        height: Number.parseFloat(style.height),
+      };
+    });
+    expect(activeIndicator.content).toBe('""');
+    expect(activeIndicator.height).toBe(2);
+  }
 });
 
 test("homepage feature cards align and stack as one rhythm", async ({
@@ -836,7 +999,7 @@ test("versioned documentation, latest routing and selector preserve deep paths",
   ).toBeVisible();
 });
 
-test("Docs navigation resolves the latest index to the registry current overview", async ({
+test("Docs navigation goes straight to the registry current overview", async ({
   page,
   isMobile,
 }) => {
@@ -845,7 +1008,10 @@ test("Docs navigation resolves the latest index to the registry current overview
   const docsLink = page
     .getByRole("navigation", { name: "Main navigation" })
     .getByRole("link", { name: "Docs" });
-  await expect(docsLink).toHaveAttribute("href", latestRoute());
+  await expect(docsLink).toHaveAttribute(
+    "href",
+    docsRoute(currentDocumentationVersion),
+  );
   await docsLink.click();
 
   const currentOverview = docsRoute(currentDocumentationVersion);
@@ -855,7 +1021,7 @@ test("Docs navigation resolves the latest index to the registry current overview
     currentOverview,
   );
   await expect(page.locator("main h1").first()).toHaveText(
-    "Combric v1.2.0 Motion & Animation System",
+    `Combric ${currentDocumentationVersion.label} Icons & React Slots`,
   );
   await expect(page).toHaveTitle(
     new RegExp(currentDocumentationVersion.label.replaceAll(".", "\\.")),
@@ -1006,7 +1172,7 @@ test("CLI and Guard documentation matches the published v1.0.0 contracts", async
   await expectNoAxeViolations(page);
 });
 
-test("current CLI and Guard documentation matches the published 1.2.0 contracts", async ({
+test("current CLI and Guard documentation matches the published contracts", async ({
   page,
 }) => {
   await page.goto(
@@ -1019,7 +1185,11 @@ test("current CLI and Guard documentation matches the published 1.2.0 contracts"
     }),
   ).toBeVisible();
   await expect(
-    page.getByText("@combric/cli@1.2.0", { exact: true }).first(),
+    page
+      .getByText(`@combric/cli@${currentDocumentationVersion.packageVersion}`, {
+        exact: true,
+      })
+      .first(),
   ).toBeVisible();
   await expect(
     page
@@ -1030,7 +1200,14 @@ test("current CLI and Guard documentation matches the published 1.2.0 contracts"
 
   await page.goto(docsRoute(currentDocumentationVersion, "reference/guard"));
   await expect(
-    page.getByText("@combric/guard@1.2.0", { exact: true }).first(),
+    page
+      .getByText(
+        `@combric/guard@${currentDocumentationVersion.packageVersion}`,
+        {
+          exact: true,
+        },
+      )
+      .first(),
   ).toBeVisible();
   await expect(
     page.getByText("GUARD_SCAN_SKIPPED", { exact: true }),
@@ -1071,7 +1248,13 @@ test.describe("mobile documentation", () => {
     const navigation = page.getByRole("navigation", {
       name: "Main navigation",
     });
-    for (const label of ["Docs", "Components", "Playground", "GitHub"]) {
+    for (const label of [
+      "Docs",
+      "Icons",
+      "Components",
+      "Playground",
+      "GitHub",
+    ]) {
       await expect(navigation.getByRole("link", { name: label })).toBeVisible();
     }
 
