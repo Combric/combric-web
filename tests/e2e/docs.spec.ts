@@ -403,6 +403,35 @@ test("homepage feature cards align and stack as one rhythm", async ({
   );
 });
 
+test("homepage release status follows the registry and desktop actions stay inline", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "Viewport changes are covered in the desktop browser");
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await page.goto("/");
+
+  await expect(page.locator(".combric-home-status")).toHaveText(
+    `Framework stable · ${currentDocumentationVersion.packageVersion}`,
+  );
+  const actions = await page
+    .locator(".hero .actions > a")
+    .evaluateAll((links) =>
+      links.map((link) => {
+        const { top } = link.getBoundingClientRect();
+        return { top };
+      }),
+    );
+  expect(actions).toHaveLength(3);
+  expect(
+    Math.max(...actions.map(({ top }) => top)) -
+      Math.min(...actions.map(({ top }) => top)),
+  ).toBeLessThanOrEqual(1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
+    1024,
+  );
+});
+
 test("wide documentation layout gives space back to content, not the TOC", async ({
   page,
   isMobile,
