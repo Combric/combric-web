@@ -90,7 +90,12 @@ const apiContracts = catalogueApiForVersion(item, version).map((contract) => {
 
 {section === "api" && (
   <>
-    <div class="combric-docs-api">
+    <div
+      class="combric-docs-api"
+      tabindex="0"
+      role="region"
+      aria-label="Component API tables"
+    >
       <table>
         <caption>Public exports</caption>
         <thead>
@@ -127,7 +132,12 @@ const apiContracts = catalogueApiForVersion(item, version).map((contract) => {
       </table>
     </div>
     {item.aliases && (
-      <div class="combric-docs-aliases">
+      <div
+        class="combric-docs-aliases"
+        tabindex="0"
+        role="region"
+        aria-label="Component aliases"
+      >
         <table>
           <caption>Exact aliases</caption>
           <thead>
