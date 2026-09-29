@@ -197,6 +197,12 @@ html[data-combric-motion-preview="reduced"] .combric-motion-demo__drawer {
   border-radius: 0.25rem;
 }
 
+@media (min-width: 50rem) {
+  .hero > .stack:only-child {
+    grid-column: 1 / -1;
+  }
+}
+
 .sidebar-content {
   gap: var(--combric-space-2);
   padding-block-start: var(--combric-space-4);

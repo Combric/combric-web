@@ -261,6 +261,15 @@ if (
     "The production hosting/domain manual gate must remain visible",
   );
 if (
+  !readme.includes(
+    `Combric packages (\`${currentDocumentationVersion.packageVersion}\`)`,
+  ) ||
+  !readme.includes(`/docs/${currentDocumentationVersion.id}/`)
+)
+  failures.push(
+    "README package version and release verification route must match the current documentation version",
+  );
+if (
   !releaseDocs.includes("published") ||
   !releaseDocs.includes("bootstrap") ||
   !releaseDocs.includes("COMBRIC_DOCS_SITE_URL") ||
@@ -604,6 +613,7 @@ if (failures.length) {
   const currentBuildPath = (...segments) =>
     join(root, "dist", "docs", currentDocumentationVersion.id, ...segments);
   const canonicalRoot = currentBuildPath("index.html");
+  const homepage = join(root, "dist", "index.html");
   const canonicalDeep = currentBuildPath(
     "components",
     "actions",
@@ -640,6 +650,9 @@ if (failures.length) {
   const latestRootHtml = existsSync(latestRoot)
     ? readFileSync(latestRoot, "utf8")
     : "";
+  const homepageHtml = existsSync(homepage)
+    ? readFileSync(homepage, "utf8")
+    : "";
   const legacyHtml = existsSync(legacyComponent)
     ? readFileSync(legacyComponent, "utf8")
     : "";
@@ -664,6 +677,7 @@ if (failures.length) {
   if (
     existsSync(join(root, "dist")) &&
     (!existsSync(canonicalRoot) ||
+      !existsSync(homepage) ||
       !existsSync(canonicalDeep) ||
       !existsSync(iconsOverview) ||
       !existsSync(regularIcons) ||
@@ -689,6 +703,16 @@ if (failures.length) {
     ) {
       console.error(
         "FAIL: latest and legacy redirects must follow the canonical version route chain",
+      );
+      process.exitCode = 1;
+    }
+    if (
+      !homepageHtml.includes(
+        `Framework stable · ${currentDocumentationVersion.packageVersion}`,
+      )
+    ) {
+      console.error(
+        "FAIL: homepage stable framework status must follow the current documentation version",
       );
       process.exitCode = 1;
     }

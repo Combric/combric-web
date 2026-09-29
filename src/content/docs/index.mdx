@@ -16,9 +16,11 @@ hero:
       variant: minimal
 ---
 
+import { currentDocumentationVersion } from "../../data/versions";
+
 <div class="combric-home-status" aria-label="Stable framework release">
   <span class="combric-home-status__marker" aria-hidden="true"></span>
-  <span>Framework stable · 1.1.1</span>
+  <span>Framework stable · {currentDocumentationVersion.packageVersion}</span>
 </div>
 
 ## A focused foundation for interface work
