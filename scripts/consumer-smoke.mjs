@@ -20,6 +20,24 @@ const packageJson = JSON.parse(
 );
 const version = currentDocumentationVersion.packageVersion;
 const publicPackages = currentDocumentationVersion.packages;
+const expectedPublicPackageNames = [
+  "@combric/tokens",
+  "@combric/icons",
+  "@combric/layout",
+  "@combric/react",
+  "@combric/tailwind",
+  "@combric/cli",
+  "@combric/guard",
+  "@combric/menu",
+];
+const expectedDirectPackageNames = [
+  "@combric/tokens",
+  "@combric/icons",
+  "@combric/layout",
+  "@combric/menu",
+  "@combric/react",
+  "@combric/tailwind",
+];
 const nativePackages = publicPackages.filter(
   (item) => item.integration !== "adapter",
 );
@@ -28,9 +46,13 @@ const adapterPackages = publicPackages.filter(
 );
 
 assert.equal(version, currentDocumentationVersion.id.slice(1));
-assert.equal(publicPackages.length, 7);
-assert.equal(new Set(publicPackages.map((item) => item.name)).size, 7);
-for (const name of ["@combric/tokens", "@combric/layout", "@combric/react"]) {
+assert.equal(publicPackages.length, 8);
+assert.equal(new Set(publicPackages.map((item) => item.name)).size, 8);
+assert.deepEqual(
+  publicPackages.map((item) => item.name),
+  expectedPublicPackageNames,
+);
+for (const name of expectedDirectPackageNames) {
   assert.equal(
     packageJson.dependencies[name],
     version,
@@ -180,6 +202,7 @@ try {
     import { renderToStaticMarkup } from "react-dom/server";
     import * as tokens from "@combric/tokens";
     import * as components from "@combric/react";
+    import * as menu from "@combric/menu";
     import { ActivityIcon, iconCatalog } from "@combric/icons";
     import { AdobeAfterEffectsIcon } from "@combric/icons/solid";
     import { ActivityIcon as DirectActivityIcon } from "@combric/icons/regular/activity";
@@ -200,6 +223,31 @@ try {
     );
     assert.match(iconSlotHtml, /combric-icon-slot/);
     assert.match(iconSlotHtml, /data-combric-icon="activity"/);
+    for (const name of [
+      "ActionMenu",
+      "Navigation",
+      "NavigationMenu",
+      "ContextMenu",
+      "Menubar",
+      "BottomNavigation",
+    ]) assert.equal(typeof menu[name], "function", name);
+    assert.equal(menu.MegaMenu, menu.NavigationMenu);
+    const menuHtml = renderToStaticMarkup(
+      createElement(
+        menu.BottomNavigation,
+        { "aria-label": "Mobile navigation" },
+        createElement(
+          menu.BottomNavigationList,
+          null,
+          createElement(menu.BottomNavigationLink, {
+            active: true,
+            href: "/home",
+            label: "Home",
+          }),
+        ),
+      ),
+    );
+    assert.match(menuHtml, /Home/);
     for (const specifier of [
       "@combric/tokens/css",
       "@combric/layout/css",
@@ -208,11 +256,12 @@ try {
       "@combric/icons/css/solid",
       "@combric/icons/metadata.json",
       "@combric/icons/svg/regular/activity.svg",
+      "@combric/menu/css",
     ]) {
       const entry = import.meta.resolve(specifier);
       assert.ok((await readFile(fileURLToPath(entry), "utf8")).trim().length > 0, specifier);
     }
-    console.log("PASS: published tokens, layout CSS, React, and Icons work without Tailwind");
+    console.log("PASS: published tokens, layout CSS, React, Icons, and Menu work without Tailwind");
   `;
   run(process.execPath, ["--input-type=module", "-e", nativeProbe], native);
 
@@ -245,6 +294,14 @@ try {
   );
   assert.equal(guardResult.schemaVersion, 1);
   assert.deepEqual(await snapshotFiles(native), beforeToolRuns);
+  await writeFile(
+    join(native, "styles.css"),
+    `${await readFile(join(native, "styles.css"), "utf8")}@import "@combric/menu/css";\n`,
+  );
+  assert.match(
+    await readFile(join(native, "styles.css"), "utf8"),
+    /@combric\/menu\/css/,
+  );
   console.log(
     "PASS: published CLI and Guard entry points run without changing the consumer project",
   );

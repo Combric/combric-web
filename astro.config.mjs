@@ -122,6 +122,10 @@ export default defineConfig({
           ],
         },
         {
+          label: "Menu",
+          items: [{ label: "Menu systems", link: docs("menu") }],
+        },
+        {
           label: "Components",
           items: componentSidebar,
         },
