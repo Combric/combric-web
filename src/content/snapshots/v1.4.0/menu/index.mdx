@@ -1,0 +1,323 @@
+---
+title: Menu
+description: "Published Combric Menu systems: navigation, action menus, Mega Menu, context menus, menubars, and bottom navigation."
+---
+
+import "@combric/menu/css";
+import "../../../../styles/menu-showcase.css";
+import { MenuShowcase } from "../../../../components/MenuShowcase";
+
+`@combric/menu` is the standalone, published React 19 package for composable
+website navigation and application-menu patterns. It builds on public
+`@combric/react` and `@combric/layout` contracts, without linking this site to
+the Framework source repository.
+
+## Install
+
+```sh
+npm install @combric/menu@1.4.0 @combric/react@1.4.0 @combric/layout@1.4.0 react react-dom
+```
+
+React and React DOM must satisfy `>=19.0.0 <20`. The published package requires
+Node.js 24 or newer.
+
+## CSS
+
+Import Menu's standalone stylesheet in the application entry point or the
+surface that renders Menu components:
+
+```css
+@import "@combric/menu/css";
+```
+
+The package preserves ordinary `className` and `style` extension points. It
+does not require Tailwind, a provider, or a source-code copy.
+
+## Interactive reference
+
+<MenuShowcase client:load />
+
+## Pick the right family
+
+| Need                     | Use                           | Semantic model                                |
+| ------------------------ | ----------------------------- | --------------------------------------------- |
+| Actions for one control  | `ActionMenu`                  | Application menu button and menu items        |
+| Site or product routes   | `Navigation`, `SideNav`       | Native `nav`, list, and links                 |
+| Rich site navigation     | `NavigationMenu` / `MegaMenu` | Disclosure-based website navigation           |
+| Pointer-specific actions | `ContextMenu`                 | Pointer-anchored application menu             |
+| Editor-style commands    | `Menubar`                     | Application menubar with roving trigger focus |
+| Compact primary routes   | `BottomNavigation`            | Native mobile-oriented link navigation        |
+
+Website navigation and application menus are deliberately different. Do not use
+an application-menu role for ordinary page navigation, and do not make a Mega
+Menu hover-only. `openOnHover` is an optional desktop convenience; click and
+keyboard activation remain available. On compact layouts, compose the same rich
+content in `Drawer` from `@combric/react` rather than depending on hover.
+
+## Action Menu
+
+`ActionMenu` owns open state. `ActionMenuContent` supports positioning through
+`side`, `align`, `offset`, `collisionPadding`, `boundary`, `container`, and
+`strategy`. Items support typeahead through `textValue`, decorative `leading`
+and `trailing` React nodes, `onSelect`, native disabled behavior, and
+`closeOnSelect` where an action should keep the menu open.
+
+```tsx
+import {
+  ActionMenu,
+  ActionMenuCheckboxItem,
+  ActionMenuContent,
+  ActionMenuItem,
+  ActionMenuRadioGroup,
+  ActionMenuRadioItem,
+  ActionMenuTrigger,
+} from "@combric/menu";
+
+export function ProjectActions() {
+  return (
+    <ActionMenu defaultOpen={false}>
+      <ActionMenuTrigger>Project actions</ActionMenuTrigger>
+      <ActionMenuContent
+        side="bottom"
+        align="start"
+        offset={8}
+        collisionPadding={12}
+      >
+        <ActionMenuItem onSelect={() => copyProjectLink()}>
+          Copy link
+        </ActionMenuItem>
+        <ActionMenuCheckboxItem defaultChecked>
+          Include archived work
+        </ActionMenuCheckboxItem>
+        <ActionMenuRadioGroup defaultValue="recent">
+          <ActionMenuRadioItem value="recent">Most recent</ActionMenuRadioItem>
+          <ActionMenuRadioItem value="name">Name</ActionMenuRadioItem>
+        </ActionMenuRadioGroup>
+      </ActionMenuContent>
+    </ActionMenu>
+  );
+}
+```
+
+### Public API
+
+| Export                                   | Public settings beyond inherited native props                                        |
+| ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| `ActionMenu`                             | `open`, `defaultOpen`, `onOpenChange`                                                |
+| `ActionMenuTrigger`                      | `leading`, `trailing`; native button props                                           |
+| `ActionMenuContent`                      | `side`, `align`, `offset`, `collisionPadding`, `boundary`, `container`, `strategy`   |
+| `ActionMenuItem`                         | `closeOnSelect`, `textValue`, `leading`, `trailing`, `onSelect`; native button props |
+| `ActionMenuCheckboxItem`                 | `checked`, `defaultChecked`, `onCheckedChange`, `closeOnSelect`                      |
+| `ActionMenuRadioGroup`                   | `value`, `defaultValue`, `onValueChange`                                             |
+| `ActionMenuRadioItem`                    | required `value`, `closeOnSelect`                                                    |
+| `ActionMenuLabel`, `ActionMenuSeparator` | native `div` presentation props                                                      |
+
+## Navigation and Side Navigation
+
+`Navigation` preserves native landmark, unordered-list, list-item, and anchor
+semantics. `NavigationList` uses `orientation="horizontal" | "vertical"`.
+`NavigationLink` exposes active state with `active`, `leading`, `trailing`, and
+a typed `render` callback for router integrations—without `asChild` cloning.
+
+```tsx
+import {
+  Navigation,
+  NavigationItem,
+  NavigationLink,
+  NavigationList,
+  SideNav,
+  SideNavGroup,
+  SideNavGroupContent,
+  SideNavGroupTrigger,
+} from "@combric/menu";
+
+<Navigation aria-label="Product">
+  <NavigationList orientation="horizontal">
+    <NavigationItem><NavigationLink active href="/overview">Overview</NavigationLink></NavigationItem>
+    <NavigationItem><NavigationLink href="/activity">Activity</NavigationLink></NavigationItem>
+  </NavigationList>
+</Navigation>
+
+<SideNav aria-label="Workspace">
+  <SideNavGroup defaultOpen>
+    <SideNavGroupTrigger>Library</SideNavGroupTrigger>
+    <SideNavGroupContent>{/* SideNavItem and SideNavLink entries */}</SideNavGroupContent>
+  </SideNavGroup>
+</SideNav>
+```
+
+### Public API
+
+| Export                                                           | Public settings beyond inherited native props          |
+| ---------------------------------------------------------------- | ------------------------------------------------------ |
+| `Navigation`, `NavigationItem`                                   | Native `nav` / `li` props                              |
+| `NavigationList`                                                 | `orientation`                                          |
+| `NavigationLink`                                                 | `active`, `leading`, `trailing`, `render`              |
+| `SideNav`, `SideNavHeader`, `SideNavContent`, `SideNavFooter`    | Native structural props                                |
+| `SideNavNavigation`, `SideNavList`, `SideNavItem`, `SideNavLink` | Same public contract as their `Navigation` counterpart |
+| `SideNavGroup`                                                   | `open`, `defaultOpen`, `onOpenChange`                  |
+| `SideNavGroupTrigger`                                            | `leading`, `trailing`; native button props             |
+| `SideNavGroupContent`                                            | Native list props                                      |
+
+## Navigation Menu and Mega Menu
+
+`NavigationMenu` keeps one expanded disclosure panel at a time. `MegaMenu` is a
+fully typed alias with the exact same public API: `MegaMenuList`, `MegaMenuItem`,
+`MegaMenuTrigger`, `MegaMenuContent`, and `MegaMenuLink` map directly to their
+`NavigationMenu*` counterparts. Put card grids, responsive images, descriptions,
+links, and CTAs inside the content—ordinary React composition is the API.
+
+```tsx
+import {
+  MegaMenu,
+  MegaMenuContent,
+  MegaMenuItem,
+  MegaMenuLink,
+  MegaMenuList,
+  MegaMenuTrigger,
+} from "@combric/menu";
+
+<MegaMenu defaultValue="solutions" openOnHover>
+  <MegaMenuList>
+    <MegaMenuItem value="solutions">
+      <MegaMenuTrigger>Solutions</MegaMenuTrigger>
+      <MegaMenuContent>
+        <ul>
+          <MegaMenuLink href="/design-systems">
+            <img src="/design-systems.jpg" alt="A design team collaborating" />
+            <strong>Design systems</strong>
+            <span>Tokens, patterns, and implementation guidance.</span>
+          </MegaMenuLink>
+        </ul>
+      </MegaMenuContent>
+    </MegaMenuItem>
+  </MegaMenuList>
+</MegaMenu>;
+```
+
+### Public API
+
+| Export                                      | Public settings beyond inherited native props                                                                         |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `NavigationMenu` / `MegaMenu`               | `value`, `defaultValue`, `onValueChange`, `openOnHover`                                                               |
+| `NavigationMenuList` / `MegaMenuList`       | Native list props                                                                                                     |
+| `NavigationMenuItem` / `MegaMenuItem`       | required `value`; native list-item props                                                                              |
+| `NavigationMenuTrigger` / `MegaMenuTrigger` | `leading`, `trailing`; native button props                                                                            |
+| `NavigationMenuContent` / `MegaMenuContent` | Native content props                                                                                                  |
+| `NavigationMenuLink` / `MegaMenuLink`       | `active`, `leading`, `trailing`, `render`; native anchor props; render within a list because each link is a list item |
+
+## Context Menu
+
+`ContextMenuTrigger` owns the contextual region. It supports native context-menu
+and keyboard activation, plus a typed `render` callback when the trigger must be
+a router or application-specific surface. Content accepts the same public
+overlay positioning settings as `ActionMenu`.
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@combric/menu";
+
+<ContextMenu>
+  <ContextMenuTrigger tabIndex={0}>Right-click this item</ContextMenuTrigger>
+  <ContextMenuContent offset={8} collisionPadding={12}>
+    <ContextMenuItem onSelect={() => duplicate()}>Duplicate</ContextMenuItem>
+    <ContextMenuItem disabled>Delete</ContextMenuItem>
+  </ContextMenuContent>
+</ContextMenu>;
+```
+
+### Public API
+
+| Export                                     | Public settings beyond inherited native props                                      |
+| ------------------------------------------ | ---------------------------------------------------------------------------------- |
+| `ContextMenu`                              | `open`, `defaultOpen`, `onOpenChange`                                              |
+| `ContextMenuTrigger`                       | `render`; native `div` props                                                       |
+| `ContextMenuContent`                       | `side`, `align`, `offset`, `collisionPadding`, `boundary`, `container`, `strategy` |
+| `ContextMenuItem`                          | `textValue`, `leading`, `trailing`, `onSelect`; native button props                |
+| `ContextMenuLabel`, `ContextMenuSeparator` | Native `div` presentation props                                                    |
+
+## Menubar
+
+`Menubar` is for application commands, not website route navigation. It keeps
+one menu open and uses roving trigger focus. Control it with `value` or start it
+uncontrolled with `defaultValue`; pass `null` to close a controlled menubar.
+
+```tsx
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarTrigger,
+} from "@combric/menu";
+
+<Menubar defaultValue="file" aria-label="Editor commands">
+  <MenubarMenu value="file">
+    <MenubarTrigger>File</MenubarTrigger>
+    <MenubarContent>
+      <MenubarItem onSelect={() => save()}>Save</MenubarItem>
+    </MenubarContent>
+  </MenubarMenu>
+</Menubar>;
+```
+
+### Public API
+
+| Export                             | Public settings beyond inherited native props                       |
+| ---------------------------------- | ------------------------------------------------------------------- |
+| `Menubar`                          | `value`, `defaultValue`, `onValueChange`                            |
+| `MenubarMenu`                      | required `value`                                                    |
+| `MenubarTrigger`                   | `leading`, `trailing`; native button props                          |
+| `MenubarContent`                   | Native content props                                                |
+| `MenubarItem`                      | `textValue`, `leading`, `trailing`, `onSelect`; native button props |
+| `MenubarLabel`, `MenubarSeparator` | Native `div` presentation props                                     |
+
+## Bottom Navigation
+
+`BottomNavigation` remains ordinary semantic link navigation. It does not force
+fixed positioning, so applications can compose it with safe areas and their own
+shell. The surface, list, individual links, and labels accept direct spacing
+settings; labels are visually centred even when a link has no icon.
+
+```tsx
+import {
+  BottomNavigation,
+  BottomNavigationLink,
+  BottomNavigationList,
+} from "@combric/menu";
+
+<BottomNavigation aria-label="Mobile" margin="0 auto" padding="0.25rem">
+  <BottomNavigationList gap="0.25rem" padding="0">
+    <BottomNavigationLink
+      active
+      href="/home"
+      label="Home"
+      padding="0.5rem 1rem"
+      labelStyle={{ fontWeight: 700 }}
+    />
+  </BottomNavigationList>
+</BottomNavigation>;
+```
+
+### Public API
+
+| Export                 | Public settings beyond inherited native props                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------- |
+| `BottomNavigation`     | `margin`, `padding`                                                                                     |
+| `BottomNavigationList` | `gap`, `margin`, `padding`                                                                              |
+| `BottomNavigationLink` | `active`, `label`, `labelClassName`, `labelStyle`, `leading`, `trailing`, `margin`, `padding`, `render` |
+
+## Accessibility and verification boundary
+
+The package provides roles, focus management, keyboard behavior, disabled item
+semantics, focus restoration, and state attributes for its composite patterns.
+Consumers still provide meaningful names, destinations, image alternatives,
+application-level focus after navigation, and appropriate mobile composition.
+
+The release gate runs package-resolution checks, build/type/static route
+validation, and Playwright plus axe regression coverage. That evidence is not a
+manual NVDA or VoiceOver test and is not a WCAG conformance claim.

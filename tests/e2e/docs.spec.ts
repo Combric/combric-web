@@ -1050,7 +1050,7 @@ test("Docs navigation goes straight to the registry current overview", async ({
     currentOverview,
   );
   await expect(page.locator("main h1").first()).toHaveText(
-    `Combric ${currentDocumentationVersion.label} Icons & React Slots`,
+    `Combric ${currentDocumentationVersion.label} Menu Systems`,
   );
   await expect(page).toHaveTitle(
     new RegExp(currentDocumentationVersion.label.replaceAll(".", "\\.")),

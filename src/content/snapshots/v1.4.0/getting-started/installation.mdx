@@ -1,0 +1,63 @@
+---
+title: Installation
+description: Install the published Combric 1.4.0 packages.
+---
+
+This is the published `v1.4.0` documentation snapshot. The public Combric
+packages are synchronized at stable version `1.4.0` on npm.
+
+## React components
+
+```sh
+npm install @combric/react@1.4.0 react@^19 react-dom@^19
+```
+
+React and React DOM `>=19.0.0 <20` are peer dependencies.
+
+## Icons
+
+```sh
+npm install @combric/icons@1.4.0
+```
+
+Icons can be used as CSS or SVG assets without React. React is an optional peer
+when consuming the React icon exports. See the [Icons reference](/docs/v1.4.0/icons/)
+for the smallest useful import pattern.
+
+## Menu systems
+
+```sh
+npm install @combric/menu@1.4.0
+```
+
+Menu has React and React DOM peer dependencies and uses the published React and
+layout packages. Load its standalone stylesheet in the application surface that
+uses it:
+
+```css
+@import "@combric/menu/css";
+```
+
+See the [Menu systems reference](/docs/v1.4.0/menu/) for navigation, menus, and
+the responsive Mega Menu pattern.
+
+## Tokens only
+
+```sh
+npm install @combric/tokens@1.4.0
+```
+
+## Framework-independent layout
+
+```sh
+npm install @combric/layout@1.4.0
+```
+
+## Optional Tailwind adapter
+
+```sh
+npm install @combric/tailwind@1.4.0 tailwindcss
+```
+
+Tailwind CSS must satisfy `>=4.3.0 <5`. Combric does not require the CLI,
+Tailwind, or source-copy installation.

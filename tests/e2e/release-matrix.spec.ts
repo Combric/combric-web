@@ -10,6 +10,7 @@ const releaseSurfaces = [
   docsRoute(currentDocumentationVersion),
   docsRoute(currentDocumentationVersion, "icons/regular"),
   docsRoute(currentDocumentationVersion, "icons/solid"),
+  docsRoute(currentDocumentationVersion, "menu"),
   docsRoute(currentDocumentationVersion, "components/actions/button"),
   docsRoute(currentDocumentationVersion, "accessibility"),
   "/playground/",

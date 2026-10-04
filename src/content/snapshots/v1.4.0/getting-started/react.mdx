@@ -1,0 +1,49 @@
+---
+title: React
+description: Use Combric React 19 components with standard CSS.
+---
+
+Import the public stylesheet once:
+
+```css
+@import "@combric/react/css";
+```
+
+Then import only public component exports:
+
+```tsx
+import { Button, Card, CardContent, Stack } from "@combric/react";
+
+export function ProjectActions() {
+  return (
+    <Card>
+      <CardContent>
+        <Stack gap="3">
+          <Button>Save project</Button>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+No Tailwind dependency, provider, or mandatory runtime theme is required.
+
+## Icons remain independent
+
+`@combric/react` accepts compatible `ReactNode` content in its published icon
+slots; it does not depend on `@combric/icons` or Iconoir. The Combric icons
+package is the reference implementation:
+
+```tsx
+import { ActivityIcon } from "@combric/icons";
+import { Button } from "@combric/react";
+
+export function ProjectActions() {
+  return <Button leadingIcon={<ActivityIcon />}>View activity</Button>;
+}
+```
+
+The slot is decorative. Keep the visible control text, or provide an accessible
+name for an icon-only control. See [Icons](/docs/v1.4.0/icons/) for the full
+contract and import guidance.

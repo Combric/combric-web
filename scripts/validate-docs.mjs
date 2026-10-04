@@ -141,10 +141,13 @@ const required = [
   currentSnapshotRelative("icons/index.mdx"),
   currentSnapshotRelative("icons/regular.mdx"),
   currentSnapshotRelative("icons/solid.mdx"),
+  currentSnapshotRelative("menu/index.mdx"),
   currentSnapshotRelative("reference/packages.mdx"),
   currentSnapshotRelative("reference/guard.mdx"),
   "src/components/IconsCatalogue.tsx",
+  "src/components/MenuShowcase.tsx",
   "src/styles/icons-catalogue.css",
+  "src/styles/menu-showcase.css",
   "src/styles/tailwind-demos.css",
   "src/assets/brand/combric-logo.png",
 ];
@@ -184,6 +187,7 @@ const installationDocs = readFileSync(
   "utf8",
 );
 const iconsDocs = readFileSync(currentSnapshotPath("icons/index.mdx"), "utf8");
+const menuDocs = readFileSync(currentSnapshotPath("menu/index.mdx"), "utf8");
 const regularIconsDocs = readFileSync(
   currentSnapshotPath("icons/regular.mdx"),
   "utf8",
@@ -198,6 +202,10 @@ const siteTitleSource = readFileSync(
 );
 const iconsCatalogueSource = readFileSync(
   join(root, "src/components/IconsCatalogue.tsx"),
+  "utf8",
+);
+const menuShowcaseSource = readFileSync(
+  join(root, "src/components/MenuShowcase.tsx"),
   "utf8",
 );
 const registeredPackageNames = currentDocumentationVersion.packages.map(
@@ -220,16 +228,16 @@ for (const name of registeredPackageNames)
   if (!packageDocs.includes(`\`${name}\``))
     failures.push(`Package reference docs omit ${name}`);
 if (
-  currentDocumentationVersion.packages.length !== 7 ||
+  currentDocumentationVersion.packages.length !== 8 ||
   registeredPackageNames.some(
     (name) =>
-      !/^(?:@combric\/(?:tokens|icons|layout|react|tailwind|cli|guard))$/.test(
+      !/^(?:@combric\/(?:tokens|icons|layout|react|tailwind|cli|guard|menu))$/.test(
         name,
       ),
   )
 )
   failures.push(
-    "The current registry must contain only the seven public packages",
+    "The current registry must contain only the eight public packages",
   );
 if (
   /^\s+(?:specifier|version):\s+(?:workspace:|link:|portal:|file:|git\+)/m.test(
@@ -324,6 +332,9 @@ if (
   !installationDocs.includes(
     `@combric/tailwind@${currentDocumentationVersion.packageVersion}`,
   ) ||
+  !installationDocs.includes(
+    `@combric/menu@${currentDocumentationVersion.packageVersion}`,
+  ) ||
   /release-candidate ready|does not claim the packages currently exist/i.test(
     installationDocs,
   )
@@ -340,6 +351,30 @@ if (
 )
   failures.push(
     "Icons documentation must preserve the public metadata, slot, and per-style CSS contracts",
+  );
+if (
+  !menuDocs.includes('@import "@combric/menu/css";') ||
+  !menuDocs.includes("<MenuShowcase client:load") ||
+  ![
+    "ActionMenu",
+    "Navigation",
+    "SideNav",
+    "MegaMenu",
+    "ContextMenu",
+    "Menubar",
+    "BottomNavigation",
+  ].every((name) => menuDocs.includes(name)) ||
+  !menuShowcaseSource.includes('from "@combric/menu"')
+)
+  failures.push(
+    "Menu documentation must use the published CSS entry point and cover every public family",
+  );
+if (
+  !astroConfig.includes('label: "Menu"') ||
+  !astroConfig.includes('docs("menu")')
+)
+  failures.push(
+    "Menu systems must remain available from the documentation sidebar",
   );
 if (
   !iconsCatalogueSource.includes('from "@combric/icons/metadata"') ||
@@ -621,6 +656,7 @@ if (failures.length) {
     "index.html",
   );
   const iconsOverview = currentBuildPath("icons", "index.html");
+  const menuOverview = currentBuildPath("menu", "index.html");
   const regularIcons = currentBuildPath("icons", "regular", "index.html");
   const solidIcons = currentBuildPath("icons", "solid", "index.html");
   const cliDoc = currentBuildPath("getting-started", "cli", "index.html");
@@ -643,6 +679,9 @@ if (failures.length) {
     : "";
   const regularIconsHtml = existsSync(regularIcons)
     ? readFileSync(regularIcons, "utf8")
+    : "";
+  const menuOverviewHtml = existsSync(menuOverview)
+    ? readFileSync(menuOverview, "utf8")
     : "";
   const solidIconsHtml = existsSync(solidIcons)
     ? readFileSync(solidIcons, "utf8")
@@ -680,6 +719,7 @@ if (failures.length) {
       !existsSync(homepage) ||
       !existsSync(canonicalDeep) ||
       !existsSync(iconsOverview) ||
+      !existsSync(menuOverview) ||
       !existsSync(regularIcons) ||
       !existsSync(solidIcons) ||
       !existsSync(cliDoc) ||
@@ -746,6 +786,7 @@ if (failures.length) {
         .join("\n");
     const regularIconsCss = stylesForPage(regularIconsHtml);
     const solidIconsCss = stylesForPage(solidIconsHtml);
+    const menuCss = stylesForPage(menuOverviewHtml);
     if (
       !regularIconsHtml.includes("data-pagefind-ignore") ||
       !solidIconsHtml.includes("data-pagefind-ignore") ||
@@ -754,6 +795,15 @@ if (failures.length) {
     ) {
       console.error(
         "FAIL: icon catalogue pages must retain local search and style-scoped CSS output",
+      );
+      process.exitCode = 1;
+    }
+    if (
+      !menuOverviewHtml.includes("Composable menu systems") ||
+      !menuCss.includes(".menu-showcase")
+    ) {
+      console.error(
+        "FAIL: Menu reference page must retain its public showcase and scoped CSS output",
       );
       process.exitCode = 1;
     }
