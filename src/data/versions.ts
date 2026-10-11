@@ -40,11 +40,31 @@ const v1_4PublicPackages = Object.freeze([
   { name: "@combric/menu", integration: "native" },
 ] as const);
 
+const v1_5PublicPackages = Object.freeze([
+  { name: "@combric/tokens", integration: "native" },
+  { name: "@combric/fonts", integration: "native" },
+  { name: "@combric/icons", integration: "native" },
+  { name: "@combric/layout", integration: "native" },
+  { name: "@combric/react", integration: "native" },
+  { name: "@combric/tailwind", integration: "adapter" },
+  { name: "@combric/cli", integration: "tooling" },
+  { name: "@combric/guard", integration: "tooling" },
+  { name: "@combric/menu", integration: "native" },
+] as const);
+
 export const documentationVersions = Object.freeze([
+  {
+    id: "v1.5.1",
+    label: "v1.5.1",
+    status: "current",
+    packageVersion: "1.5.1",
+    contentRoot: "docs/v1.5.1",
+    packages: v1_5PublicPackages,
+  },
   {
     id: "v1.4.0",
     label: "v1.4.0",
-    status: "current",
+    status: "previous",
     packageVersion: "1.4.0",
     contentRoot: "docs/v1.4.0",
     packages: v1_4PublicPackages,

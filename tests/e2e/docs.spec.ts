@@ -1244,6 +1244,43 @@ test("current CLI and Guard documentation matches the published contracts", asyn
   await expectNoAxeViolations(page);
 });
 
+test("current typography documents opt-in fonts without loading them globally", async ({
+  page,
+}) => {
+  const fontRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.resourceType() === "font") fontRequests.push(request.url());
+  });
+  await page.goto(
+    docsRoute(currentDocumentationVersion, "foundations/typography"),
+  );
+  await expect(
+    page.getByRole("heading", { name: "Optional Fontsource preset" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      `@combric/fonts@${currentDocumentationVersion.packageVersion}`,
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Local, Google, Adobe, or another provider",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "This documentation site keeps that default and does not import",
+      {
+        exact: false,
+      },
+    ),
+  ).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  expect(fontRequests).toEqual([]);
+  await expectNoAxeViolations(page);
+});
+
 test.describe("mobile documentation", () => {
   test.skip(({ isMobile }) => !isMobile, "mobile project only");
 

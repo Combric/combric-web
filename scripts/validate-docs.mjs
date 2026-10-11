@@ -186,6 +186,15 @@ const installationDocs = readFileSync(
   currentSnapshotPath("getting-started/installation.mdx"),
   "utf8",
 );
+const typographyDocs = readFileSync(
+  currentSnapshotPath("foundations/typography.mdx"),
+  "utf8",
+);
+const docsCss = readFileSync(join(root, "src/styles/docs.css"), "utf8");
+const tailwindDemosCss = readFileSync(
+  join(root, "src/styles/tailwind-demos.css"),
+  "utf8",
+);
 const iconsDocs = readFileSync(currentSnapshotPath("icons/index.mdx"), "utf8");
 const menuDocs = readFileSync(currentSnapshotPath("menu/index.mdx"), "utf8");
 const regularIconsDocs = readFileSync(
@@ -228,16 +237,16 @@ for (const name of registeredPackageNames)
   if (!packageDocs.includes(`\`${name}\``))
     failures.push(`Package reference docs omit ${name}`);
 if (
-  currentDocumentationVersion.packages.length !== 8 ||
+  currentDocumentationVersion.packages.length !== 9 ||
   registeredPackageNames.some(
     (name) =>
-      !/^(?:@combric\/(?:tokens|icons|layout|react|tailwind|cli|guard|menu))$/.test(
+      !/^(?:@combric\/(?:tokens|fonts|icons|layout|react|tailwind|cli|guard|menu))$/.test(
         name,
       ),
   )
 )
   failures.push(
-    "The current registry must contain only the eight public packages",
+    "The current registry must contain only the nine public packages",
   );
 if (
   /^\s+(?:specifier|version):\s+(?:workspace:|link:|portal:|file:|git\+)/m.test(
@@ -310,6 +319,7 @@ if (
   !guardDocs.includes(
     `@combric/guard@${currentDocumentationVersion.packageVersion}`,
   ) ||
+  !guardDocs.includes("@combric/fonts/css") ||
   !guardDocs.includes("GUARD_SCAN_SKIPPED") ||
   !guardDocs.includes("GUARD_TOKEN_UNKNOWN")
 )
@@ -335,12 +345,41 @@ if (
   !installationDocs.includes(
     `@combric/menu@${currentDocumentationVersion.packageVersion}`,
   ) ||
+  !installationDocs.includes(
+    `@combric/fonts@${currentDocumentationVersion.packageVersion}`,
+  ) ||
   /release-candidate ready|does not claim the packages currently exist/i.test(
     installationDocs,
   )
 )
   failures.push(
     `Installation docs do not match the ${currentDocumentationVersion.id} published packages`,
+  );
+if (
+  ![
+    `@combric/fonts@${currentDocumentationVersion.packageVersion}`,
+    '@import "@combric/fonts/css";',
+    "Inter Variable",
+    "JetBrains Mono Variable",
+    "--combric-primitive-font-family-sans",
+    "--combric-primitive-font-family-mono",
+    "Google Fonts",
+    "Adobe Fonts",
+    "font-display: swap",
+    'Leave out: @import "@combric/fonts/css";',
+  ].every((fragment) => typographyDocs.includes(fragment))
+)
+  failures.push(
+    "Typography documentation must preserve the optional preset and custom-provider contracts",
+  );
+if (
+  packageJson.dependencies?.["@combric/fonts"] ||
+  docsCss.includes("@combric/fonts") ||
+  tailwindDemosCss.includes("@combric/fonts") ||
+  astroConfig.includes("@combric/fonts")
+)
+  failures.push(
+    "COMBRIC-WEB must document @combric/fonts without loading it as a global default",
   );
 if (
   !iconsDocs.includes("@combric/icons/metadata") ||

@@ -1,0 +1,88 @@
+---
+title: Installation
+description: Install the published Combric 1.5.1 packages.
+---
+
+This is the published `v1.5.1` documentation snapshot. The public Combric
+packages are synchronized at stable version `1.5.1` on npm.
+
+## React components
+
+```sh
+npm install @combric/react@1.5.1 react@^19 react-dom@^19
+```
+
+React and React DOM `>=19.0.0 <20` are peer dependencies.
+
+## Icons
+
+```sh
+npm install @combric/icons@1.5.1
+```
+
+Icons can be used as CSS or SVG assets without React. React is an optional peer
+when consuming the React icon exports. See the [Icons reference](/docs/v1.5.1/icons/)
+for the smallest useful import pattern.
+
+## Menu systems
+
+```sh
+npm install @combric/menu@1.5.1
+```
+
+Menu has React and React DOM peer dependencies and uses the published React and
+layout packages. Load its standalone stylesheet in the application surface that
+uses it:
+
+```css
+@import "@combric/menu/css";
+```
+
+See the [Menu systems reference](/docs/v1.5.1/menu/) for navigation, menus, and
+the responsive Mega Menu pattern.
+
+## Optional Fontsource typography
+
+Combric does not require a web-font package. A consumer application that wants
+the official self-hosted Inter Variable and JetBrains Mono Variable preset can
+opt in explicitly:
+
+```sh
+npm install @combric/fonts@1.5.1
+```
+
+Put the preset after all other Combric CSS imports in the application's entry
+stylesheet:
+
+```css
+@import "@combric/react/css";
+@import "@combric/fonts/css";
+```
+
+For local files, Google Fonts, Adobe Fonts, or another provider, do not import
+the preset. Load the selected provider and set both
+`--combric-primitive-font-family-sans` and
+`--combric-primitive-font-family-mono` after the Combric CSS. See
+[Typography](/docs/v1.5.1/foundations/typography/) for the complete no-duplicate
+provider pattern and privacy, CSP, cache, and licence checks.
+
+## Tokens only
+
+```sh
+npm install @combric/tokens@1.5.1
+```
+
+## Framework-independent layout
+
+```sh
+npm install @combric/layout@1.5.1
+```
+
+## Optional Tailwind adapter
+
+```sh
+npm install @combric/tailwind@1.5.1 tailwindcss
+```
+
+Tailwind CSS must satisfy `>=4.3.0 <5`. Combric does not require the CLI,
+Tailwind, or source-copy installation.
