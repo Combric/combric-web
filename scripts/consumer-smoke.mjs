@@ -22,6 +22,7 @@ const version = currentDocumentationVersion.packageVersion;
 const publicPackages = currentDocumentationVersion.packages;
 const expectedPublicPackageNames = [
   "@combric/tokens",
+  "@combric/fonts",
   "@combric/icons",
   "@combric/layout",
   "@combric/react",
@@ -46,8 +47,8 @@ const adapterPackages = publicPackages.filter(
 );
 
 assert.equal(version, currentDocumentationVersion.id.slice(1));
-assert.equal(publicPackages.length, 8);
-assert.equal(new Set(publicPackages.map((item) => item.name)).size, 8);
+assert.equal(publicPackages.length, 9);
+assert.equal(new Set(publicPackages.map((item) => item.name)).size, 9);
 assert.deepEqual(
   publicPackages.map((item) => item.name),
   expectedPublicPackageNames,
@@ -59,6 +60,11 @@ for (const name of expectedDirectPackageNames) {
     `${name} must match the current docs package version`,
   );
 }
+assert.equal(
+  packageJson.dependencies["@combric/fonts"],
+  undefined,
+  "COMBRIC-WEB documents the optional font preset without loading it globally",
+);
 
 const temporaryRoot = await mkdtemp(join(tmpdir(), "combric-web-consumer-"));
 const isWindows = process.platform === "win32";
@@ -179,7 +185,7 @@ try {
   };
   const native = await createFixture("native", nativeDependencies, {
     "styles.css":
-      '@import "@combric/react/css";\n@import "@combric/icons/css/regular";\n',
+      '@import "@combric/react/css";\n@import "@combric/icons/css/regular";\n@import "@combric/fonts/css";\n',
   });
   for (const item of nativePackages)
     await assertInstalledVersion(native, item.name);
@@ -206,6 +212,10 @@ try {
     import { ActivityIcon, iconCatalog } from "@combric/icons";
     import { AdobeAfterEffectsIcon } from "@combric/icons/solid";
     import { ActivityIcon as DirectActivityIcon } from "@combric/icons/regular/activity";
+    const fontPreset = await readFile(
+      fileURLToPath(import.meta.resolve("@combric/fonts/css")),
+      "utf8",
+    );
     assert.ok(Object.keys(tokens).length > 0);
     assert.equal(typeof components.Button, "function");
     const html = renderToStaticMarkup(createElement(components.Button, null, "Public consumer"));
@@ -248,6 +258,11 @@ try {
       ),
     );
     assert.match(menuHtml, /Home/);
+    assert.match(fontPreset, /@import "@combric\/tokens\/css";/);
+    assert.match(fontPreset, /@import "@fontsource-variable\/inter";/);
+    assert.match(fontPreset, /@import "@fontsource-variable\/jetbrains-mono";/);
+    assert.match(fontPreset, /--combric-primitive-font-family-sans/);
+    assert.match(fontPreset, /--combric-primitive-font-family-mono/);
     for (const specifier of [
       "@combric/tokens/css",
       "@combric/layout/css",
@@ -257,13 +272,60 @@ try {
       "@combric/icons/metadata.json",
       "@combric/icons/svg/regular/activity.svg",
       "@combric/menu/css",
+      "@combric/fonts/css",
     ]) {
       const entry = import.meta.resolve(specifier);
       assert.ok((await readFile(fileURLToPath(entry), "utf8")).trim().length > 0, specifier);
     }
-    console.log("PASS: published tokens, layout CSS, React, Icons, and Menu work without Tailwind");
+    console.log("PASS: published tokens, Fonts, layout CSS, React, Icons, and Menu work without Tailwind");
   `;
   run(process.execPath, ["--input-type=module", "-e", nativeProbe], native);
+
+  const customProvider = await createFixture(
+    "custom-font-provider",
+    {
+      "@combric/react": version,
+      react: packageJson.dependencies.react,
+      "react-dom": packageJson.dependencies["react-dom"],
+    },
+    {
+      "styles.css": String.raw`@import "@combric/react/css";
+
+@font-face {
+  font-family: "Brand Sans";
+  src: url("/fonts/brand-sans.woff2") format("woff2");
+  font-display: swap;
+}
+
+:root {
+  --combric-primitive-font-family-sans: "Brand Sans", ui-sans-serif, system-ui, sans-serif;
+  --combric-primitive-font-family-mono: "Brand Mono", ui-monospace, monospace;
+}
+`,
+    },
+  );
+  assert.equal(
+    existsSync(join(customProvider, "node_modules", "@combric", "fonts")),
+    false,
+    "a custom-provider consumer must not install the optional font preset",
+  );
+  assert.equal(
+    existsSync(
+      join(customProvider, "node_modules", "@fontsource-variable", "inter"),
+    ),
+    false,
+    "a custom-provider consumer must not receive Fontsource Inter",
+  );
+  const customProviderCss = await readFile(
+    join(customProvider, "styles.css"),
+    "utf8",
+  );
+  assert.doesNotMatch(customProviderCss, /@combric\/fonts\/css/);
+  assert.match(customProviderCss, /--combric-primitive-font-family-sans/);
+  assert.match(customProviderCss, /--combric-primitive-font-family-mono/);
+  console.log(
+    "PASS: a custom provider can override both font primitives without Fontsource assets",
+  );
 
   const beforeToolRuns = await snapshotFiles(native);
   const cliHelp = runLocalBin(native, "combric", ["--help"]);
@@ -293,6 +355,13 @@ try {
     runLocalBin(native, "combric-guard", ["check", "--json"]),
   );
   assert.equal(guardResult.schemaVersion, 1);
+  assert.equal(
+    guardResult.diagnostics.some(
+      (diagnostic) => diagnostic.ruleId === "GUARD_CSS_ENTRY",
+    ),
+    false,
+    "Guard must accept the published @combric/fonts/css entry point",
+  );
   assert.deepEqual(await snapshotFiles(native), beforeToolRuns);
   await writeFile(
     join(native, "styles.css"),

@@ -1,0 +1,73 @@
+---
+title: Typography
+description: Canonical font, size, weight, line-height, and tracking tokens.
+---
+
+import TokenTable from "../../../../components/TokenTable.astro";
+
+Typography is system-first by default. Heading roles combine size, tight line
+height, emphasis, and restrained tracking without requiring a web font. This
+documentation site keeps that default and does not import `@combric/fonts`.
+
+## Optional Fontsource preset
+
+Consumer applications can opt into the official Fontsource preset when they
+want its self-hosted variable-font defaults:
+
+```sh title="Install the optional preset"
+npm install @combric/fonts@1.5.1
+```
+
+Import the preset last, after every other Combric stylesheet used by the
+application. It reassigns the typography primitives after token imports:
+
+```css title="src/styles/combric-fontsource.css" wrap
+@import "@combric/react/css";
+@import "@combric/menu/css";
+/* Import any other Combric CSS before the preset. */
+@import "@combric/fonts/css";
+```
+
+The preset uses Fontsource to emit self-hosted WOFF2 assets for Inter Variable
+and JetBrains Mono Variable. Its sans fallback is `"Inter Variable", Inter,
+ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif`; its
+monospace fallback starts with `"JetBrains Mono Variable", ui-monospace,
+SFMono-Regular, Menlo, Monaco, Consolas, monospace`. The bundled faces use
+`font-display: swap`, so verify the intended FOUT and layout stability in the
+consumer build. The preset supplies normal variable faces; add an explicit
+italic face if a product needs one.
+
+## Local, Google, Adobe, or another provider
+
+Choose one provider path. For a local font, Google Fonts, Adobe Fonts, or any
+other provider, omit the preset and override **both** primitives after the
+Combric CSS. This avoids ambiguous family names, duplicate requests, and
+unnecessary Fontsource assets:
+
+```css title="src/styles/combric-brand-fonts.css" wrap
+@import "@combric/react/css";
+/* Leave out: @import "@combric/fonts/css"; */
+
+@font-face {
+  font-family: "Brand Sans";
+  src: url("/fonts/brand-sans.woff2") format("woff2");
+  font-display: swap;
+}
+
+:root {
+  --combric-primitive-font-family-sans:
+    "Brand Sans", ui-sans-serif, system-ui, sans-serif;
+  --combric-primitive-font-family-mono:
+    "Brand Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+```
+
+For Google Fonts, Adobe Fonts, or another hosted provider, load only that
+provider's approved stylesheet or embed method, then apply the same two
+primitive overrides in your application CSS. Check the provider licence,
+privacy terms, Content Security Policy, cache policy, and the MIME type for
+locally served WOFF2 assets. Do not combine a provider face named Inter Variable
+or JetBrains Mono Variable with `@combric/fonts` unless duplicated assets are an
+intentional product decision.
+
+<TokenTable prefix={["font.", "line.height.", "letter.spacing."]} />
